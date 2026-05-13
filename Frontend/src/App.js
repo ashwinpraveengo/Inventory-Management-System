@@ -15,21 +15,15 @@ import Sales from "./pages/Sales";
 import PurchaseDetails from "./pages/PurchaseDetails";
 
 const App = () => {
-  const [user, setUser] = useState("");
+  const [user, setUser] = useState(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    return storedUser || "";
+  });
   const [loader, setLoader] = useState(true);
-  let myLoginUser = JSON.parse(localStorage.getItem("user"));
-  // console.log("USER: ",user)
 
   useEffect(() => {
-    if (myLoginUser) {
-      setUser(myLoginUser._id);
-      setLoader(false);
-      // console.log("inside effect", myLoginUser)
-    } else {
-      setUser("");
-      setLoader(false);
-    }
-  }, [myLoginUser]);
+    setLoader(false);
+  }, []);
 
   const signin = (newUser, callback) => {
     setUser(newUser);

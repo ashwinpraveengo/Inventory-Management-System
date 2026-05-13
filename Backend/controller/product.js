@@ -1,94 +1,169 @@
 const Product = require("../models/product");
+
 const Purchase = require("../models/purchase");
+
 const Sales = require("../models/sales");
+
 const { Op } = require("sequelize");
 
-// Add Post
+
+// ADD PRODUCT
 const addProduct = async (req, res) => {
   try {
-    console.log("req: ", req.body.userId);
     const newProduct = await Product.create({
-      userID: req.body.userId,
+      userID: req.user.id,
       name: req.body.name,
       manufacturer: req.body.manufacturer,
       stock: 0,
       description: req.body.description,
     });
-    res.status(200).send(newProduct);
+
+    res.status(201).json(newProduct);
   } catch (err) {
-    res.status(402).send(err);
+    console.log(err);
+
+    res.status(500).json({
+      message: "Server error",
+    });
   }
 };
 
-// Get All Products
+
+// GET PRODUCTS
 const getAllProducts = async (req, res) => {
   try {
-    const findAllProducts = await Product.findAll({
+    const products = await Product.findAll({
       where: {
-        userID: req.params.userId,
+        userID: req.user.id,
       },
-      order: [['id', 'DESC']],
+
+      order: [["id", "DESC"]],
     });
-    res.json(findAllProducts);
+
+    res.json(products);
   } catch (err) {
-    res.status(500).send(err);
+    console.log(err);
+
+    res.status(500).json({
+      message: "Server error",
+    });
   }
 };
 
-// Delete Selected Product
+
+// DELETE PRODUCT
 const deleteSelectedProduct = async (req, res) => {
   try {
-    const deleteProduct = await Product.destroy({
-      where: { id: req.params.id }
+    const product = await Product.findOne({
+      where: {
+        id: req.params.id,
+        userID: req.user.id,
+      },
     });
-    const deletePurchaseProduct = await Purchase.destroy({
-      where: { ProductID: req.params.id }
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
+    }
+
+    await Purchase.destroy({
+      where: {
+        ProductID: req.params.id,
+      },
     });
-    const deleteSaleProduct = await Sales.destroy({
-      where: { ProductID: req.params.id }
+
+    await Sales.destroy({
+      where: {
+        ProductID: req.params.id,
+      },
     });
-    res.json({ deleteProduct, deletePurchaseProduct, deleteSaleProduct });
+
+    await Product.destroy({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    res.json({
+      message: "Product deleted",
+    });
   } catch (err) {
-    res.status(500).send(err);
+    console.log(err);
+
+    res.status(500).json({
+      message: "Server error",
+    });
   }
 };
 
-// Update Selected Product
+
+// UPDATE PRODUCT
 const updateSelectedProduct = async (req, res) => {
   try {
-    const [updated] = await Product.update(
+    const product = await Product.findOne({
+      where: {
+        id: req.params.id,
+        userID: req.user.id,
+      },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
+    }
+
+    await Product.update(
       {
         name: req.body.name,
         manufacturer: req.body.manufacturer,
         description: req.body.description,
       },
       {
-        where: { id: req.body.productID },
-        returning: true,
+        where: {
+          id: req.params.id,
+        },
       }
     );
-    const updatedProduct = await Product.findByPk(req.body.productID);
+
+    const updatedProduct = await Product.findByPk(
+      req.params.id
+    );
+
     res.json(updatedProduct);
-  } catch (error) {
-    console.log(error);
-    res.status(402).send("Error");
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      message: "Server error",
+    });
   }
 };
 
-// Search Products
+
+// SEARCH PRODUCT
 const searchProduct = async (req, res) => {
   try {
     const searchTerm = req.query.searchTerm;
+
     const products = await Product.findAll({
       where: {
+        userID: req.user.id,
+
         name: {
           [Op.iLike]: `%${searchTerm}%`,
         },
       },
     });
+
     res.json(products);
   } catch (err) {
-    res.status(500).send(err);
+    console.log(err);
+
+    res.status(500).json({
+      message: "Server error",
+    });
   }
 };
 
@@ -99,4 +174,3 @@ module.exports = {
   updateSelectedProduct,
   searchProduct,
 };
-

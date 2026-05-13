@@ -7,14 +7,16 @@ function Store() {
   const [stores, setAllStores] = useState([]);
 
   const authContext = useContext(AuthContext);
+  const userId = authContext.user?.id ?? authContext.user;
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [userId]);
 
   // Fetching all stores data
   const fetchData = () => {
-    fetch(`http://localhost:4000/api/store/get/${authContext.user}`)
+    if (!userId) return;
+    fetch(`http://localhost:4000/api/store/get/${userId}`)
       .then((response) => response.json())
       .then((data) => {
         setAllStores(data);

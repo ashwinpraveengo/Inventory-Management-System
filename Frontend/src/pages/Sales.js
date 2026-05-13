@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useCallback, useState, useEffect, useContext } from "react";
 import AddSale from "../components/AddSale";
 import AuthContext from "../AuthContext";
 
@@ -10,41 +10,43 @@ function Sales() {
   const [updatePage, setUpdatePage] = useState(true);
 
   const authContext = useContext(AuthContext);
+  const userId = authContext.user?.id ?? authContext.user;
+
+  const fetchSalesData = useCallback(() => {
+    if (!userId) return;
+    fetch(`http://localhost:4000/api/sales/get/${userId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setAllSalesData(data);
+      })
+      .catch((err) => console.error("fetchSalesData", err));
+  }, [userId]);
+
+  const fetchProductsData = useCallback(() => {
+    if (!userId) return;
+    fetch(`http://localhost:4000/api/product/get/${userId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setAllProducts(data);
+      })
+      .catch((err) => console.error("fetchProductsData", err));
+  }, [userId]);
+
+  const fetchStoresData = useCallback(() => {
+    if (!userId) return;
+    fetch(`http://localhost:4000/api/store/get/${userId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setAllStores(data);
+      })
+      .catch((err) => console.error("fetchStoresData", err));
+  }, [userId]);
 
   useEffect(() => {
     fetchSalesData();
     fetchProductsData();
     fetchStoresData();
-  }, [updatePage]);
-
-  // Fetching Data of All Sales
-  const fetchSalesData = () => {
-    fetch(`http://localhost:4000/api/sales/get/${authContext.user}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setAllSalesData(data);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  // Fetching Data of All Products
-  const fetchProductsData = () => {
-    fetch(`http://localhost:4000/api/product/get/${authContext.user}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setAllProducts(data);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  // Fetching Data of All Stores
-  const fetchStoresData = () => {
-    fetch(`http://localhost:4000/api/store/get/${authContext.user}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setAllStores(data);
-      });
-  };
+  }, [updatePage, userId, fetchSalesData, fetchProductsData, fetchStoresData]);
 
   // Modal for Sale Add
   const addSaleModalSetting = () => {

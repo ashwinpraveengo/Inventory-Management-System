@@ -9,15 +9,17 @@ function PurchaseDetails() {
   const [updatePage, setUpdatePage] = useState(true);
 
   const authContext = useContext(AuthContext);
+  const userId = authContext.user?.id ?? authContext.user;
 
   useEffect(() => {
     fetchPurchaseData();
     fetchProductsData();
-  }, [updatePage]);
+  }, [updatePage, userId]);
 
   // Fetching Data of All Purchase items
   const fetchPurchaseData = () => {
-    fetch(`http://localhost:4000/api/purchase/get/${authContext.user}`)
+    if (!userId) return;
+    fetch(`http://localhost:4000/api/purchase/get/${userId}`)
       .then((response) => response.json())
       .then((data) => {
         setAllPurchaseData(data);
@@ -27,7 +29,8 @@ function PurchaseDetails() {
 
   // Fetching Data of All Products
   const fetchProductsData = () => {
-    fetch(`http://localhost:4000/api/product/get/${authContext.user}`)
+    if (!userId) return;
+    fetch(`http://localhost:4000/api/product/get/${userId}`)
       .then((response) => response.json())
       .then((data) => {
         setAllProducts(data);

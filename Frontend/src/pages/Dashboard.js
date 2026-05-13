@@ -1,10 +1,17 @@
-import React, { useContext, useEffect, useState } from "react";
-import Chart from "react-apexcharts";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import AuthContext from "../AuthContext";
-import { Doughnut } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Bar, Doughnut } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 export const data = {
   labels: ["Apple", "Knorr", "Shoop", "Green", "Purple", "Orange"],
   datasets: [
@@ -69,68 +76,144 @@ function Dashboard() {
   });
 
   // Update Chart Data
-  const updateChartData = (salesData) => {
-    setChart({
-      ...chart,
+  const updateChartData = useCallback((salesData) => {
+    const safeData = Array.isArray(salesData) ? salesData : [];
+    setChart((prevChart) => ({
+      ...prevChart,
       series: [
         {
           name: "Monthly Sales Amount",
-          data: [...salesData],
+          data: safeData,
         },
       ],
-    });
-  };
+    }));
+  }, []);
 
   const authContext = useContext(AuthContext);
+  const userId = authContext.user?.id ?? authContext.user;
+
+  const handleResponse = useCallback(async (response) => {
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API request failed: ${response.status} ${errorText}`);
+    }
+    return response.json();
+  }, []);
+
+  const fetchTotalSaleAmount = useCallback(() => {
+    if (!userId) return;
+    fetch(`http://localhost:4000/api/sales/get/${userId}/totalsaleamount`)
+      .then(handleResponse)
+      .then((datas) => setSaleAmount(datas.totalSaleAmount || 0))
+      .catch((err) => console.error("fetchTotalSaleAmount", err));
+  }, [userId, handleResponse]);
+
+  const fetchTotalPurchaseAmount = useCallback(() => {
+    if (!userId) return;
+    fetch(`http://localhost:4000/api/purchase/get/${userId}/totalpurchaseamount`)
+      .then(handleResponse)
+      .then((datas) => setPurchaseAmount(datas.totalPurchaseAmount || 0))
+      .catch((err) => console.error("fetchTotalPurchaseAmount", err));
+  }, [userId, handleResponse]);
+
+  const fetchStoresData = useCallback(() => {
+    if (!userId) return;
+    fetch(`http://localhost:4000/api/store/get/${userId}`)
+      .then(handleResponse)
+      .then((datas) => setStores(Array.isArray(datas) ? datas : []))
+      .catch((err) => console.error("fetchStoresData", err));
+  }, [userId, handleResponse]);
+
+  const fetchProductsData = useCallback(() => {
+    if (!userId) return;
+    fetch(`http://localhost:4000/api/product/get/${userId}`)
+      .then(handleResponse)
+      .then((datas) => setProducts(Array.isArray(datas) ? datas : []))
+      .catch((err) => console.error("fetchProductsData", err));
+  }, [userId, handleResponse]);
+
+  const fetchMonthlySalesData = useCallback(() => {
+    fetch(`http://localhost:4000/api/sales/getmonthly`)
+      .then(handleResponse)
+      .then((datas) => updateChartData(Array.isArray(datas?.salesAmount) ? datas.salesAmount : []))
+      .catch((err) => console.error("fetchMonthlySalesData", err));
+  }, [handleResponse, updateChartData]);
 
   useEffect(() => {
+    if (!userId) return;
+
     fetchTotalSaleAmount();
     fetchTotalPurchaseAmount();
     fetchStoresData();
     fetchProductsData();
     fetchMonthlySalesData();
-  }, []);
+  }, [userId, fetchTotalSaleAmount, fetchTotalPurchaseAmount, fetchStoresData, fetchProductsData, fetchMonthlySalesData]);
 
-  // Fetching total sales amount
-  const fetchTotalSaleAmount = () => {
-    fetch(
-      `http://localhost:4000/api/sales/get/${authContext.user}/totalsaleamount`
-    )
-      .then((response) => response.json())
-      .then((datas) => setSaleAmount(datas.totalSaleAmount));
+  const safeChartSeries = Array.isArray(chart.series)
+    ? chart.series.map((serie) => ({
+        ...serie,
+        data: Array.isArray(serie.data) ? serie.data : [],
+      }))
+    : [
+        {
+          name: "Monthly Sales Amount",
+          data: [],
+        },
+      ];
+
+  const safeChartOptions = chart.options ?? {};
+
+  const shouldRenderChart =
+    Array.isArray(safeChartSeries) &&
+    safeChartSeries.length > 0 &&
+    safeChartSeries.every((serie) => Array.isArray(serie.data));
+
+  const barChartData = {
+    labels: safeChartOptions.xaxis?.categories ?? [],
+    datasets: [
+      {
+        label: "Monthly Sales Amount",
+        data: safeChartSeries[0]?.data ?? [],
+        backgroundColor: "rgba(59, 130, 246, 0.6)",
+        borderColor: "rgba(37, 99, 235, 1)",
+        borderWidth: 1,
+      },
+    ],
   };
 
-  // Fetching total purchase amount
-  const fetchTotalPurchaseAmount = () => {
-    fetch(
-      `http://localhost:4000/api/purchase/get/${authContext.user}/totalpurchaseamount`
-    )
-      .then((response) => response.json())
-      .then((datas) => setPurchaseAmount(datas.totalPurchaseAmount));
+  const barChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: true,
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Month",
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Sales Amount",
+        },
+        beginAtZero: true,
+      },
+    },
   };
 
-  // Fetching all stores data
-  const fetchStoresData = () => {
-    fetch(`http://localhost:4000/api/store/get/${authContext.user}`)
-      .then((response) => response.json())
-      .then((datas) => setStores(datas));
-  };
-
-  // Fetching Data of All Products
-  const fetchProductsData = () => {
-    fetch(`http://localhost:4000/api/product/get/${authContext.user}`)
-      .then((response) => response.json())
-      .then((datas) => setProducts(datas))
-      .catch((err) => console.log(err));
-  };
-
-  // Fetching Monthly Sales
-  const fetchMonthlySalesData = () => {
-    fetch(`http://localhost:4000/api/sales/getmonthly`)
-      .then((response) => response.json())
-      .then((datas) => updateChartData(datas.salesAmount))
-      .catch((err) => console.log(err));
-  };
+  console.log("Dashboard chart props", {
+    series: safeChartSeries,
+    options: safeChartOptions,
+    shouldRenderChart,
+    barChartData,
+  });
 
   return (
     <>
@@ -276,13 +359,14 @@ function Dashboard() {
           </div>
         </article>
         <div className="flex justify-around bg-white rounded-lg py-8 col-span-full justify-center">
-          <div>
-            <Chart
-              options={chart.options}
-              series={chart.series}
-              type="bar"
-              width="500"
-            />
+          <div className="w-full max-w-3xl">
+            {shouldRenderChart ? (
+              <Bar data={barChartData} options={barChartOptions} />
+            ) : (
+              <div className="text-sm text-gray-500 p-4">
+                Chart data unavailable or still loading.
+              </div>
+            )}
           </div>
           <div>
             <Doughnut data={data} />

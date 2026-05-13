@@ -9,8 +9,9 @@ export default function AddSale({
   handlePageUpdate,
   authContext
 }) {
+  const userId = authContext.user?.id ?? authContext.user;
   const [sale, setSale] = useState({
-    userID: authContext.user,
+    userID: userId,
     productID: "",
     storeID: "",
     stockSold: "",

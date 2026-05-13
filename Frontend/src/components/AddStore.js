@@ -6,8 +6,9 @@ import AuthContext from "../AuthContext";
 
 export default function AddStore() {
   const authContext = useContext(AuthContext);
+  const userId = authContext.user?.id ?? authContext.user;
   const [form, setForm] = useState({
-    userId: authContext.user,
+    userId,
     name: "",
     category: "",
     address: "",

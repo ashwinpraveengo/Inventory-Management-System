@@ -1,22 +1,49 @@
 const express = require("express");
-const app = express();
+
+const router = express.Router();
+
 const product = require("../controller/product");
 
-// Add Product
-app.post("/add", product.addProduct);
+const authMiddleware = require("../middleware/authMiddleware");
 
-// Get All Products
-app.get("/get/:userId", product.getAllProducts);
 
-// Delete Selected Product Item
-app.get("/delete/:id", product.deleteSelectedProduct);
+// ADD PRODUCT
+router.post(
+  "/add",
+  authMiddleware,
+  product.addProduct
+);
 
-// Update Selected Product
-app.post("/update", product.updateSelectedProduct);
 
-// Search Product
-app.get("/search", product.searchProduct);
+// GET PRODUCTS
+router.get(
+  "/get",
+  authMiddleware,
+  product.getAllProducts
+);
 
-// http://localhost:4000/api/product/search?searchTerm=fa
 
-module.exports = app;
+// DELETE PRODUCT
+router.delete(
+  "/delete/:id",
+  authMiddleware,
+  product.deleteSelectedProduct
+);
+
+
+// UPDATE PRODUCT
+router.put(
+  "/update/:id",
+  authMiddleware,
+  product.updateSelectedProduct
+);
+
+
+// SEARCH PRODUCT
+router.get(
+  "/search",
+  authMiddleware,
+  product.searchProduct
+);
+
+module.exports = router;

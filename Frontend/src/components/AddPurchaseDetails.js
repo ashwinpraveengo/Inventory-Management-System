@@ -8,8 +8,9 @@ export default function AddPurchaseDetails({
   handlePageUpdate,
   authContext
 }) {
+  const userId = authContext.user?.id ?? authContext.user;
   const [purchase, setPurchase] = useState({
-    userID: authContext.user,
+    userID: userId,
     productID: "",
     quantityPurchased: "",
     purchaseDate: "",
