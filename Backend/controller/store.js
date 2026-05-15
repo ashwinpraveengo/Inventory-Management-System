@@ -31,4 +31,47 @@ const getAllStores = async (req, res) => {
   }
 };
 
-module.exports = { addStore, getAllStores };
+// Delete Store
+const deleteStore = async (req, res) => {
+  try {
+    const store = await Store.findOne({
+      where: { id: req.params.id, userID: req.user.id },
+    });
+    if (!store) return res.status(404).json({ message: "Store not found" });
+
+    await Store.destroy({ where: { id: req.params.id } });
+    res.json({ message: "Store deleted" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Update Store
+const updateStore = async (req, res) => {
+  try {
+    const store = await Store.findOne({
+      where: { id: req.params.id, userID: req.user.id },
+    });
+    if (!store) return res.status(404).json({ message: "Store not found" });
+
+    await Store.update(
+      {
+        name: req.body.name,
+        category: req.body.category,
+        address: req.body.address,
+        city: req.body.city,
+        image: req.body.image,
+      },
+      { where: { id: req.params.id } }
+    );
+
+    const updatedStore = await Store.findByPk(req.params.id);
+    res.json(updatedStore);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { addStore, getAllStores, deleteStore, updateStore };

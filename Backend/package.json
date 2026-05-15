@@ -14,6 +14,7 @@
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
+    "csurf": "^1.11.0",
     "dotenv": "^16.6.1",
     "express": "^4.18.2",
     "express-rate-limit": "^8.5.1",
@@ -23,10 +24,12 @@
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^8.0.7",
     "nodemon": "^3.0.1",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.35.2",
+    "svg-captcha": "^1.4.0",
     "xss-clean": "^0.1.4"
   }
 }

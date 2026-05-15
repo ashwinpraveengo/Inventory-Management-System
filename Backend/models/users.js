@@ -39,12 +39,18 @@ const User = sequelize.define(
     },
 
     imageUrl: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
     },
 
     role: {
       type: DataTypes.STRING,
       defaultValue: "user",
+    },
+    resetPasswordToken: {
+      type: DataTypes.STRING,
+    },
+    resetPasswordExpires: {
+      type: DataTypes.DATE,
     },
   },
   {

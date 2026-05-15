@@ -17,13 +17,19 @@ function SideMenu() {
   const localStorageData = JSON.parse(localStorage.getItem("user")) || {};
   const location = useLocation();
 
-  const navigation = [
+  let navigation = [
     { name: "Dashboard", href: "/", icon: ChartPieIcon },
     { name: "Inventory", href: "/inventory", icon: ArchiveBoxIcon },
     { name: "Purchase Details", href: "/purchase-details", icon: ShoppingCartIcon },
     { name: "Sales", href: "/sales", icon: BanknotesIcon },
     { name: "Manage Store", href: "/manage-store", icon: BuildingStorefrontIcon },
   ];
+
+  if (localStorageData.role === "manager") {
+    navigation = navigation.filter(item => item.name !== "Manage Store");
+  } else if (localStorageData.role === "user") {
+    navigation = navigation.filter(item => ["Dashboard", "Inventory"].includes(item.name));
+  }
 
   return (
     <div className="flex h-full w-64 flex-col bg-white border-r border-gray-200">
@@ -70,7 +76,7 @@ function SideMenu() {
       </div>
 
       {/* Profile Section at Bottom */}
-      <div className="flex shrink-0 border-t border-gray-200 p-4">
+      <Link to="/profile" className="flex shrink-0 border-t border-gray-200 p-4 hover:bg-gray-50 transition-colors">
         <div className="group block w-full flex-shrink-0">
           <div className="flex items-center">
             <div>
@@ -94,7 +100,7 @@ function SideMenu() {
             </div>
           </div>
         </div>
-      </div>
+      </Link>
     </div>
   );
 }

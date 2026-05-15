@@ -1,9 +1,13 @@
+import { fetchWithAuth } from "../utils/fetchWithAuth";
 import React, { useCallback, useState, useEffect, useContext } from "react";
 import AddSale from "../components/AddSale";
+import UpdateSale from "../components/UpdateSale";
 import AuthContext from "../AuthContext";
 
 function Sales() {
   const [showSaleModal, setShowSaleModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateSaleData, setUpdateSaleData] = useState(null);
   const [sales, setAllSalesData] = useState([]);
   const [products, setAllProducts] = useState([]);
   const [stores, setAllStores] = useState([]);
@@ -14,9 +18,7 @@ function Sales() {
 
   const fetchSalesData = useCallback(() => {
     if (!userId) return;
-    fetch(`http://localhost:4000/api/sales/get`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    })
+    fetchWithAuth(`http://localhost:4000/api/sales/get`)
       .then((response) => response.json())
       .then((data) => {
         setAllSalesData(data);
@@ -26,9 +28,7 @@ function Sales() {
 
   const fetchProductsData = useCallback(() => {
     if (!userId) return;
-    fetch(`http://localhost:4000/api/product/get`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    })
+    fetchWithAuth(`http://localhost:4000/api/product/get`)
       .then((response) => response.json())
       .then((data) => {
         setAllProducts(data);
@@ -38,9 +38,7 @@ function Sales() {
 
   const fetchStoresData = useCallback(() => {
     if (!userId) return;
-    fetch(`http://localhost:4000/api/store/get`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    })
+    fetchWithAuth(`http://localhost:4000/api/store/get`)
       .then((response) => response.json())
       .then((data) => {
         setAllStores(data);
@@ -54,14 +52,33 @@ function Sales() {
     fetchStoresData();
   }, [updatePage, userId, fetchSalesData, fetchProductsData, fetchStoresData]);
 
-  // Modal for Sale Add
   const addSaleModalSetting = () => {
     setShowSaleModal(!showSaleModal);
   };
 
-  // Handle Page Update
+  const updateModalSetting = (element) => {
+    setUpdateSaleData(element || null);
+    setShowUpdateModal(!showUpdateModal);
+  };
+
   const handlePageUpdate = () => {
     setUpdatePage(!updatePage);
+  };
+
+  const deleteSale = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this sale? Stock will be restored.")) return;
+    try {
+      const response = await fetchWithAuth(`http://localhost:4000/api/sales/delete/${id}`, { method: "DELETE" });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to delete sale.");
+      }
+      alert("Sale deleted and stock restored.");
+      handlePageUpdate();
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Server Error");
+    }
   };
 
   return (
@@ -73,6 +90,13 @@ function Sales() {
           stores={stores}
           handlePageUpdate={handlePageUpdate}
           authContext={authContext}
+        />
+      )}
+      {showUpdateModal && updateSaleData && (
+        <UpdateSale
+          updateModalSetting={updateModalSetting}
+          handlePageUpdate={handlePageUpdate}
+          updateSaleData={updateSaleData}
         />
       )}
 
@@ -108,23 +132,26 @@ function Sales() {
                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Total Sale Amount
                 </th>
+                <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {sales.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500">
+                  <td colSpan="6" className="px-6 py-8 text-center text-sm text-gray-500">
                     No sales records found.
                   </td>
                 </tr>
               ) : (
                 sales.map((element) => (
-                  <tr key={element._id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={element.id} className="hover:bg-gray-50 transition-colors">
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                      {element.ProductID?.name}
+                      {element.product?.name}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      {element.StoreID?.name}
+                      {element.store?.name}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -136,6 +163,20 @@ function Sales() {
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900">
                       ${element.TotalSaleAmount}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium space-x-3">
+                      <button
+                        className="text-indigo-600 hover:text-indigo-900 font-medium transition-colors focus:outline-none"
+                        onClick={() => updateModalSetting(element)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="text-red-600 hover:text-red-900 font-medium transition-colors focus:outline-none"
+                        onClick={() => deleteSale(element.id)}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))

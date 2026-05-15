@@ -11,4 +11,10 @@ app.get("/get", authMiddleware, purchase.getPurchaseData);
 
 app.get("/get/totalpurchaseamount", authMiddleware, purchase.getTotalPurchaseAmount);
 
+// Delete Purchase
+app.delete("/delete/:id", authMiddleware, purchase.deletePurchase);
+
+// Update Purchase
+app.put("/update/:id", authMiddleware, purchase.updatePurchase);
+
 module.exports = app;

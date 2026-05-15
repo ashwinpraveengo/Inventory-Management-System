@@ -3,35 +3,35 @@ import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
-export default function UpdateProduct({
-  updateProductData,
+export default function UpdatePurchase({
   updateModalSetting,
   handlePageUpdate,
+  updatePurchaseData,
 }) {
-  const [product, setProduct] = useState({
-    name: updateProductData.name,
-    manufacturer: updateProductData.manufacturer,
-    description: updateProductData.description || "",
+  const [purchase, setPurchase] = useState({
+    quantityPurchased: updatePurchaseData.QuantityPurchased,
+    purchaseDate: updatePurchaseData.PurchaseDate,
+    totalPurchaseAmount: updatePurchaseData.TotalPurchaseAmount,
   });
   const [open, setOpen] = useState(true);
   const cancelButtonRef = useRef(null);
 
   const handleInputChange = (key, value) => {
-    setProduct({ ...product, [key]: value });
+    setPurchase({ ...purchase, [key]: value });
   };
 
   const handleUpdate = () => {
-    fetchWithAuth(`http://localhost:4000/api/product/update/${updateProductData.id}`, {
+    fetchWithAuth(`http://localhost:4000/api/purchase/update/${updatePurchaseData.id}`, {
       method: "PUT",
       headers: { "Content-type": "application/json" },
-      body: JSON.stringify(product),
+      body: JSON.stringify(purchase),
     })
       .then(async (result) => {
         if (!result.ok) {
           const err = await result.json().catch(() => ({}));
-          throw new Error(err.message || "Failed to update product.");
+          throw new Error(err.message || "Failed to update purchase.");
         }
-        alert("Product updated successfully!");
+        alert("Purchase updated successfully!");
         handlePageUpdate();
         updateModalSetting();
       })
@@ -58,21 +58,24 @@ export default function UpdateProduct({
                     </div>
                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                       <Dialog.Title as="h3" className="text-lg py-4 font-semibold leading-6 text-gray-900">
-                        Edit Product
+                        Edit Purchase
                       </Dialog.Title>
+                      <p className="text-sm text-gray-500 mb-4">
+                        Product: <span className="font-medium text-gray-700">{updatePurchaseData.product?.name || "N/A"}</span>
+                      </p>
                       <form action="#">
                         <div className="grid gap-4 mb-4 sm:grid-cols-2">
                           <div>
-                            <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900">Product Name</label>
-                            <input type="text" name="name" id="name" value={product.name} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
+                            <label htmlFor="quantityPurchased" className="block mb-2 text-sm font-medium text-gray-900">Quantity Purchased</label>
+                            <input type="number" name="quantityPurchased" id="quantityPurchased" value={purchase.quantityPurchased} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
                           </div>
                           <div>
-                            <label htmlFor="manufacturer" className="block mb-2 text-sm font-medium text-gray-900">Manufacturer</label>
-                            <input type="text" name="manufacturer" id="manufacturer" value={product.manufacturer} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
+                            <label htmlFor="totalPurchaseAmount" className="block mb-2 text-sm font-medium text-gray-900">Total Purchase Amount</label>
+                            <input type="number" name="totalPurchaseAmount" id="totalPurchaseAmount" value={purchase.totalPurchaseAmount} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
                           </div>
                           <div className="sm:col-span-2">
-                            <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900">Description</label>
-                            <textarea name="description" id="description" rows="3" value={product.description} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
+                            <label htmlFor="purchaseDate" className="block mb-2 text-sm font-medium text-gray-900">Purchase Date</label>
+                            <input type="date" name="purchaseDate" id="purchaseDate" value={purchase.purchaseDate} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
                           </div>
                         </div>
                       </form>

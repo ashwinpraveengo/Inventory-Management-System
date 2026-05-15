@@ -1,3 +1,4 @@
+import { fetchWithAuth } from "../utils/fetchWithAuth";
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
@@ -8,7 +9,6 @@ export default function AddPurchaseDetails({
   handlePageUpdate,
   authContext
 }) {
-  const userId = authContext.user?.id ?? authContext.user;
   const [purchase, setPurchase] = useState({
     productID: "",
     quantityPurchased: "",
@@ -26,21 +26,27 @@ export default function AddPurchaseDetails({
   };
 
   // POST Data
-  const addSale = () => {
-    fetch("http://localhost:4000/api/purchase/add", {
+  const addPurchase = () => {
+    fetchWithAuth("http://localhost:4000/api/purchase/add", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`
       },
       body: JSON.stringify(purchase),
     })
-      .then((result) => {
+      .then(async (result) => {
+        if (!result.ok) {
+          const err = await result.json().catch(() => ({}));
+          throw new Error(err.message || "Failed to add purchase. Check inputs.");
+        }
         alert("Purchase ADDED");
         handlePageUpdate();
         addSaleModalSetting();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.error(err);
+        alert(err.message || "Server Error");
+      });
   };
 
   return (
@@ -111,7 +117,7 @@ export default function AddPurchaseDetails({
                               <option selected="">Select Products</option>
                               {products.map((element, index) => {
                                 return (
-                                  <option key={element._id} value={element._id}>
+                                  <option key={element.id} value={element.id}>
                                     {element.name}
                                   </option>
                                 );
@@ -214,7 +220,7 @@ export default function AddPurchaseDetails({
                   <button
                     type="button"
                     className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto"
-                    onClick={addSale}
+                    onClick={addPurchase}
                   >
                     Add
                   </button>

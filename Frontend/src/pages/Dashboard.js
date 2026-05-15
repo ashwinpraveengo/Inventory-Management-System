@@ -1,3 +1,4 @@
+import { fetchWithAuth } from "../utils/fetchWithAuth";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import AuthContext from "../AuthContext";
 import { Bar, Doughnut } from "react-chartjs-2";
@@ -102,9 +103,7 @@ function Dashboard() {
 
   const fetchTotalSaleAmount = useCallback(() => {
     if (!userId) return;
-    fetch(`http://localhost:4000/api/sales/get/totalsaleamount`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    })
+    fetchWithAuth(`http://localhost:4000/api/sales/get/totalsaleamount`)
       .then(handleResponse)
       .then((datas) => setSaleAmount(datas.totalSaleAmount || 0))
       .catch((err) => console.error("fetchTotalSaleAmount", err));
@@ -112,9 +111,7 @@ function Dashboard() {
 
   const fetchTotalPurchaseAmount = useCallback(() => {
     if (!userId) return;
-    fetch(`http://localhost:4000/api/purchase/get/totalpurchaseamount`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    })
+    fetchWithAuth(`http://localhost:4000/api/purchase/get/totalpurchaseamount`)
       .then(handleResponse)
       .then((datas) => setPurchaseAmount(datas.totalPurchaseAmount || 0))
       .catch((err) => console.error("fetchTotalPurchaseAmount", err));
@@ -122,9 +119,7 @@ function Dashboard() {
 
   const fetchStoresData = useCallback(() => {
     if (!userId) return;
-    fetch(`http://localhost:4000/api/store/get`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    })
+    fetchWithAuth(`http://localhost:4000/api/store/get`)
       .then(handleResponse)
       .then((datas) => setStores(Array.isArray(datas) ? datas : []))
       .catch((err) => console.error("fetchStoresData", err));
@@ -132,18 +127,14 @@ function Dashboard() {
 
   const fetchProductsData = useCallback(() => {
     if (!userId) return;
-    fetch(`http://localhost:4000/api/product/get`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    })
+    fetchWithAuth(`http://localhost:4000/api/product/get`)
       .then(handleResponse)
       .then((datas) => setProducts(Array.isArray(datas) ? datas : []))
       .catch((err) => console.error("fetchProductsData", err));
   }, [userId, handleResponse]);
 
   const fetchMonthlySalesData = useCallback(() => {
-    fetch(`http://localhost:4000/api/sales/getmonthly`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    })
+    fetchWithAuth(`http://localhost:4000/api/sales/getmonthly`)
       .then(handleResponse)
       .then((datas) => updateChartData(Array.isArray(datas?.salesAmount) ? datas.salesAmount : []))
       .catch((err) => console.error("fetchMonthlySalesData", err));

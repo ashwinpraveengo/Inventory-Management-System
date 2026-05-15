@@ -1,29 +1,23 @@
+import { fetchWithAuth } from "../utils/fetchWithAuth";
 import React, {
   useEffect,
   useState,
   useCallback,
 } from "react";
 import AddProduct from "../components/AddProduct";
+import UpdateProduct from "../components/UpdateProduct";
 
 const Inventory = () => {
-
-  const token = localStorage.getItem("token");
-
   const [products, setProducts] = useState([]);
   const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateProductData, setUpdateProductData] = useState(null);
   const [updatePage, setUpdatePage] = useState(true);
 
   const getProducts = useCallback(async () => {
-
     try {
-
-      const response = await fetch(
-        "http://localhost:4000/api/product/get",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await fetchWithAuth(
+        "http://localhost:4000/api/product/get"
       );
 
       if (!response.ok) {
@@ -31,37 +25,22 @@ const Inventory = () => {
       }
 
       const data = await response.json();
-
       setProducts(data);
-
     } catch (err) {
-
       console.log(err);
     }
-
-  }, [token]);
-
+  }, []);
 
   useEffect(() => {
-
     getProducts();
-
   }, [getProducts, updatePage]);
 
-
   const deleteProduct = async (id) => {
-
+    if (!window.confirm("Are you sure you want to delete this product? All related sales and purchases will also be removed.")) return;
     try {
-
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `http://localhost:4000/api/product/delete/${id}`,
-        {
-          method: "DELETE",
-
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { method: "DELETE" }
       );
 
       if (!response.ok) {
@@ -69,19 +48,20 @@ const Inventory = () => {
       }
 
       const data = await response.json();
-
       console.log(data);
-
       getProducts();
-
     } catch (err) {
-
       console.log(err);
     }
   };
 
   const addProductModalSetting = () => {
     setShowAddProductModal(!showAddProductModal);
+  };
+
+  const updateModalSetting = (product) => {
+    setUpdateProductData(product || null);
+    setShowUpdateModal(!showUpdateModal);
   };
 
   const handlePageUpdate = () => {
@@ -93,6 +73,13 @@ const Inventory = () => {
       {showAddProductModal && (
         <AddProduct
           addProductModalSetting={addProductModalSetting}
+          handlePageUpdate={handlePageUpdate}
+        />
+      )}
+      {showUpdateModal && updateProductData && (
+        <UpdateProduct
+          updateProductData={updateProductData}
+          updateModalSetting={updateModalSetting}
           handlePageUpdate={handlePageUpdate}
         />
       )}
@@ -125,7 +112,7 @@ const Inventory = () => {
                   Stock
                 </th>
                 <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Action
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -138,9 +125,9 @@ const Inventory = () => {
                 </tr>
               ) : (
                 products.map((product) => (
-                  <tr key={product._id || product.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      {product._id || product.id}
+                      {product.id}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
                       {product.name}
@@ -153,10 +140,16 @@ const Inventory = () => {
                         {product.stock} units
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium space-x-3">
+                      <button
+                        className="text-indigo-600 hover:text-indigo-900 font-medium transition-colors focus:outline-none"
+                        onClick={() => updateModalSetting(product)}
+                      >
+                        Edit
+                      </button>
                       <button
                         className="text-red-600 hover:text-red-900 font-medium transition-colors focus:outline-none"
-                        onClick={() => deleteProduct(product._id || product.id)}
+                        onClick={() => deleteProduct(product.id)}
                       >
                         Delete
                       </button>

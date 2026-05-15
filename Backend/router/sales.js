@@ -12,4 +12,10 @@ app.get("/getmonthly", authMiddleware, sales.getMonthlySales);
 
 app.get("/get/totalsaleamount", authMiddleware, sales.getTotalSalesAmount);
 
+// Delete Sale
+app.delete("/delete/:id", authMiddleware, sales.deleteSale);
+
+// Update Sale
+app.put("/update/:id", authMiddleware, sales.updateSale);
+
 module.exports = app;

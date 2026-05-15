@@ -1,3 +1,4 @@
+import { fetchWithAuth } from "../utils/fetchWithAuth";
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
@@ -9,7 +10,6 @@ export default function AddSale({
   handlePageUpdate,
   authContext
 }) {
-  const userId = authContext.user?.id ?? authContext.user;
   const [sale, setSale] = useState({
     productID: "",
     storeID: "",
@@ -28,20 +28,26 @@ export default function AddSale({
 
   // POST Data
   const addSale = () => {
-    fetch("http://localhost:4000/api/sales/add", {
+    fetchWithAuth("http://localhost:4000/api/sales/add", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`
       },
       body: JSON.stringify(sale),
     })
-      .then((result) => {
+      .then(async (result) => {
+        if (!result.ok) {
+          const err = await result.json().catch(() => ({}));
+          throw new Error(err.message || "Failed to add sale. Check inputs.");
+        }
         alert("Sale ADDED");
         handlePageUpdate();
         addSaleModalSetting();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.error(err);
+        alert(err.message || "Server Error");
+      });
   };
 
   return (
@@ -112,7 +118,7 @@ export default function AddSale({
                               <option selected="">Select Products</option>
                               {products.map((element, index) => {
                                 return (
-                                  <option key={element._id} value={element._id}>
+                                  <option key={element.id} value={element.id}>
                                     {element.name}
                                   </option>
                                 );
@@ -157,7 +163,7 @@ export default function AddSale({
                               <option selected="">Select Store</option>
                               {stores.map((element, index) => {
                                 return (
-                                  <option key={element._id} value={element._id}>
+                                  <option key={element.id} value={element.id}>
                                     {element.name}
                                   </option>
                                 );

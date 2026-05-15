@@ -3,35 +3,37 @@ import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
-export default function UpdateProduct({
-  updateProductData,
+export default function UpdateStore({
   updateModalSetting,
   handlePageUpdate,
+  updateStoreData,
 }) {
-  const [product, setProduct] = useState({
-    name: updateProductData.name,
-    manufacturer: updateProductData.manufacturer,
-    description: updateProductData.description || "",
+  const [store, setStore] = useState({
+    name: updateStoreData.name,
+    category: updateStoreData.category || "",
+    address: updateStoreData.address || "",
+    city: updateStoreData.city || "",
+    image: updateStoreData.image || "",
   });
   const [open, setOpen] = useState(true);
   const cancelButtonRef = useRef(null);
 
   const handleInputChange = (key, value) => {
-    setProduct({ ...product, [key]: value });
+    setStore({ ...store, [key]: value });
   };
 
   const handleUpdate = () => {
-    fetchWithAuth(`http://localhost:4000/api/product/update/${updateProductData.id}`, {
+    fetchWithAuth(`http://localhost:4000/api/store/update/${updateStoreData.id}`, {
       method: "PUT",
       headers: { "Content-type": "application/json" },
-      body: JSON.stringify(product),
+      body: JSON.stringify(store),
     })
       .then(async (result) => {
         if (!result.ok) {
           const err = await result.json().catch(() => ({}));
-          throw new Error(err.message || "Failed to update product.");
+          throw new Error(err.message || "Failed to update store.");
         }
-        alert("Product updated successfully!");
+        alert("Store updated successfully!");
         handlePageUpdate();
         updateModalSetting();
       })
@@ -58,21 +60,29 @@ export default function UpdateProduct({
                     </div>
                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                       <Dialog.Title as="h3" className="text-lg py-4 font-semibold leading-6 text-gray-900">
-                        Edit Product
+                        Edit Store
                       </Dialog.Title>
                       <form action="#">
                         <div className="grid gap-4 mb-4 sm:grid-cols-2">
                           <div>
-                            <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900">Product Name</label>
-                            <input type="text" name="name" id="name" value={product.name} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
+                            <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900">Store Name</label>
+                            <input type="text" name="name" id="name" value={store.name} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
                           </div>
                           <div>
-                            <label htmlFor="manufacturer" className="block mb-2 text-sm font-medium text-gray-900">Manufacturer</label>
-                            <input type="text" name="manufacturer" id="manufacturer" value={product.manufacturer} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
+                            <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900">Category</label>
+                            <input type="text" name="category" id="category" value={store.category} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
+                          </div>
+                          <div>
+                            <label htmlFor="address" className="block mb-2 text-sm font-medium text-gray-900">Address</label>
+                            <input type="text" name="address" id="address" value={store.address} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
+                          </div>
+                          <div>
+                            <label htmlFor="city" className="block mb-2 text-sm font-medium text-gray-900">City</label>
+                            <input type="text" name="city" id="city" value={store.city} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
                           </div>
                           <div className="sm:col-span-2">
-                            <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900">Description</label>
-                            <textarea name="description" id="description" rows="3" value={product.description} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
+                            <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-900">Image URL</label>
+                            <input type="text" name="image" id="image" value={store.image} onChange={(e) => handleInputChange(e.target.name, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" />
                           </div>
                         </div>
                       </form>

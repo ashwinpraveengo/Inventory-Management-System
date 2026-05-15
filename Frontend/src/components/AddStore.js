@@ -1,12 +1,11 @@
+import { fetchWithAuth } from "../utils/fetchWithAuth";
 import { Fragment, useRef, useState, useContext } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import UploadImage from "./UploadImage";
 import AuthContext from "../AuthContext";
 
-export default function AddStore() {
-  const authContext = useContext(AuthContext);
-  const userId = authContext.user?.id ?? authContext.user;
+export default function AddStore({ addStoreModalSetting, handlePageUpdate }) {
   const [form, setForm] = useState({
     name: "",
     category: "",
@@ -23,19 +22,27 @@ export default function AddStore() {
   const cancelButtonRef = useRef(null);
 
   const addProduct = () => {
-    fetch("http://localhost:4000/api/store/add", {
+    fetchWithAuth("http://localhost:4000/api/store/add", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`
       },
       body: JSON.stringify(form),
     })
-      .then((result) => {
-        alert("STORE ADDED");
+      .then(async (result) => {
+        if (!result.ok) {
+          const err = await result.json().catch(() => ({}));
+          throw new Error(err.message || "Failed to add store.");
+        }
+        alert("Store ADDED");
+        if (handlePageUpdate) handlePageUpdate();
+        if (addStoreModalSetting) addStoreModalSetting();
         setOpen(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.error(err);
+        alert(err.message || "Server Error");
+      });
   };
 
   // Uploading image to cloudinary
@@ -240,7 +247,7 @@ export default function AddStore() {
                   <button
                     type="button"
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                    onClick={() => setOpen(false)}
+                    onClick={() => { setOpen(false); if (addStoreModalSetting) addStoreModalSetting(); }}
                     ref={cancelButtonRef}
                   >
                     Cancel

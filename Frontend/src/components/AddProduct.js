@@ -1,6 +1,7 @@
-import { Fragment, useRef, useState } from "react";
+import React, { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { fetchWithAuth } from "../utils/fetchWithAuth";
 
 export default function AddProduct({
   addProductModalSetting,
@@ -14,28 +15,33 @@ export default function AddProduct({
   });
   const [open, setOpen] = useState(true);
   const cancelButtonRef = useRef(null);
-  const token = localStorage.getItem("token");
 
   const handleInputChange = (e) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
   };
 
-  const addProduct = () => {
-    fetch("http://localhost:4000/api/product/add", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(product),
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        alert("Product ADDED");
-        handlePageUpdate();
-        addProductModalSetting();
-      })
-      .catch((err) => console.log(err));
+  const addProduct = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetchWithAuth("http://localhost:4000/api/product/add", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(product),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.message || "Failed");
+        return;
+      }
+      alert("Product ADDED");
+      handlePageUpdate();
+      addProductModalSetting();
+    } catch (err) {
+      console.log(err);
+      alert("Server Error");
+    }
   };
 
   return (

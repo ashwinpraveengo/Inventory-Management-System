@@ -4,7 +4,7 @@ const soldStock = async (productID, stockSoldData) => {
   // Updating sold stock
   try {
     const myProductData = await Product.findByPk(productID);
-    let myUpdatedStock = myProductData.stock - stockSoldData;
+    let myUpdatedStock = parseInt(myProductData.stock) - parseInt(stockSoldData);
     console.log("MY SOLD STOCK: ", myUpdatedStock);
 
     const SoldStock = await Product.update(

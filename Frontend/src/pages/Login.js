@@ -1,6 +1,8 @@
-import React, { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { fetchWithAuth } from "../utils/fetchWithAuth";
+import React, { useContext, useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import AuthContext from "../AuthContext";
+import { EyeIcon, EyeSlashIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -9,19 +11,42 @@ const Login = () => {
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
+    captchaAnswer: "",
   });
+
+  const [captchaSvg, setCaptchaSvg] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+
+  const loadCaptcha = async () => {
+    try {
+      const response = await fetch("http://localhost:4000/api/auth/captcha", {
+        credentials: "include"
+      });
+      const svg = await response.text();
+      setCaptchaSvg(svg);
+    } catch (err) {
+      console.log("Failed to load captcha", err);
+    }
+  };
+
+  useEffect(() => {
+    loadCaptcha();
+  }, []);
 
   const handleChange = (e) => {
     setLoginData({
       ...loginData,
       [e.target.name]: e.target.value,
     });
+    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     try {
-      const response = await fetch("http://localhost:4000/api/auth/login", {
+      const response = await fetchWithAuth("http://localhost:4000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,11 +57,12 @@ const Login = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Login failed");
+        setError(data.message || "Login failed");
+        loadCaptcha();
+        setLoginData({ ...loginData, captchaAnswer: "" });
         return;
       }
 
-      localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       alert("Login Successful");
 
@@ -45,7 +71,7 @@ const Login = () => {
       });
     } catch (err) {
       console.log(err);
-      alert("Server Error");
+      setError("Server Error. Please try again later.");
     }
   };
 
@@ -60,6 +86,13 @@ const Login = () => {
             Please sign in to your account
           </p>
         </div>
+        
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
@@ -76,17 +109,66 @@ const Login = () => {
                 onChange={handleChange}
               />
             </div>
+            
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">
-                Password
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-gray-700" htmlFor="password">
+                  Password
+                </label>
+                <Link to="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+                  Forgot your password?
+                </Link>
+              </div>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all duration-200"
+                  placeholder="••••••••"
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeSlashIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden="true" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Security Check
               </label>
+              <div className="flex items-center gap-4 mb-2">
+                <div 
+                  className="bg-white border border-gray-300 rounded-lg p-2 flex-grow flex justify-center"
+                  dangerouslySetInnerHTML={{ __html: captchaSvg }}
+                />
+                <button
+                  type="button"
+                  onClick={loadCaptcha}
+                  className="p-2 text-gray-500 hover:text-blue-600 transition-colors bg-gray-100 rounded-lg"
+                  title="Reload Captcha"
+                >
+                  <ArrowPathIcon className="h-6 w-6" />
+                </button>
+              </div>
               <input
-                id="password"
-                name="password"
-                type="password"
+                id="captchaAnswer"
+                name="captchaAnswer"
+                type="text"
                 required
+                value={loginData.captchaAnswer}
                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all duration-200"
-                placeholder="••••••••"
+                placeholder="Enter the characters above"
                 onChange={handleChange}
               />
             </div>
