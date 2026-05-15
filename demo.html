@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IMS – Security Audit & Demo Guide</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1117;
+    --ink-2: #3a3d4a;
+    --ink-3: #717589;
+    --surface: #ffffff;
+    --surface-2: #f7f8fc;
+    --surface-3: #eef0f7;
+    --border: #e2e5f0;
+    --border-2: #c8cce0;
+    --accent: #1a3fcc;
+    --accent-light: #e8edff;
+    --accent-mid: #4f6ef7;
+    --success: #0a7c4e;
+    --success-bg: #e6f7f0;
+    --warning: #9a5a00;
+    --warning-bg: #fff4e0;
+    --danger: #c0180f;
+    --danger-bg: #fdecea;
+    --info: #0e5fa0;
+    --info-bg: #e6f2ff;
+    --neutral: #4a5060;
+    --neutral-bg: #f0f2f7;
+    --sidebar-w: 270px;
+    --radius: 10px;
+    --radius-lg: 16px;
+    --mono: 'JetBrains Mono', monospace;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--surface-2);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── SIDEBAR ── */
+  nav {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--ink);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    padding: 2rem 0;
+    flex-shrink: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #333 transparent;
+  }
+
+  .nav-logo {
+    padding: 0 1.5rem 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 1.5rem;
+  }
+
+  .nav-logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+
+  .nav-logo h2 {
+    font-family: var(--serif);
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    padding: 0.8rem 1.5rem 0.4rem;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255,255,255,0.55);
+    padding: 0.45rem 1.5rem;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 400;
+    transition: all 0.15s ease;
+    border-left: 2px solid transparent;
+  }
+
+  nav a .nav-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    background: rgba(255,255,255,0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: rgba(255,255,255,0.4);
+    flex-shrink: 0;
+  }
+
+  nav a:hover {
+    color: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.06);
+  }
+
+  nav a.active {
+    color: #fff;
+    background: rgba(79,110,247,0.2);
+    border-left-color: var(--accent-mid);
+  }
+
+  nav a.active .nav-num {
+    color: var(--accent-mid);
+    background: rgba(79,110,247,0.15);
+  }
+
+  /* ── MAIN ── */
+  main {
+    flex: 1;
+    padding: 3rem 3.5rem;
+    max-width: 1100px;
+    overflow: auto;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .phase-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .phase-num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--accent-light);
+    -webkit-text-stroke: 1.5px var(--accent-mid);
+    flex-shrink: 0;
+    margin-top: -4px;
+  }
+
+  .phase-header-text h1 {
+    font-family: var(--serif);
+    font-size: 2.2rem;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+  }
+
+  .phase-header-text p {
+    color: var(--ink-3);
+    font-size: 14.5px;
+  }
+
+  /* ── SECTION ── */
+  section { margin-bottom: 5rem; }
+
+  h2.section-title {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin: 2.5rem 0 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  h2.section-title::after {
+    content: '';
+    display: block;
+    height: 1px;
+    flex: 1;
+    background: var(--border);
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    text-align: center;
+  }
+
+  .stat-card .stat-num {
+    font-family: var(--serif);
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-card .stat-label {
+    font-size: 12px;
+    color: var(--ink-3);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .stat-low .stat-num { color: var(--success); }
+  .stat-med .stat-num { color: var(--warning); }
+  .stat-high .stat-num { color: var(--danger); }
+  .stat-total .stat-num { color: var(--accent); }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 3px 9px;
+    border-radius: 5px;
+    white-space: nowrap;
+  }
+
+  .badge-low { background: var(--success-bg); color: var(--success); }
+  .badge-medium { background: var(--warning-bg); color: var(--warning); }
+  .badge-high { background: var(--danger-bg); color: var(--danger); }
+  .badge-na { background: var(--neutral-bg); color: var(--neutral); }
+  .badge-ok { background: var(--success-bg); color: var(--success); }
+  .badge-partial { background: var(--warning-bg); color: var(--warning); }
+  .badge-missing { background: var(--danger-bg); color: var(--danger); }
+
+  /* ── AUDIT TABLE ── */
+  .audit-category {
+    margin-bottom: 2.5rem;
+  }
+
+  .audit-category h3 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 0.75rem;
+    padding-left: 2px;
+  }
+
+  .audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    font-size: 13.5px;
+  }
+
+  .audit-table thead tr {
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .audit-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .audit-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+
+  .audit-table tr:last-child td { border-bottom: none; }
+
+  .audit-table tr:hover td { background: var(--surface-2); }
+
+  .audit-table td:first-child {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .audit-table td code {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    background: var(--surface-3);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .evidence-text { color: var(--ink-2); }
+
+  .fix-text {
+    color: var(--ink-3);
+    font-size: 13px;
+  }
+
+  /* ── FEATURE CARDS ── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-mid), transparent);
+  }
+
+  .feature-card h4 {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+
+  .feature-card p {
+    font-size: 13px;
+    color: var(--ink-3);
+    line-height: 1.6;
+  }
+
+  .feature-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent-light);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  /* ── ARCH DIAGRAM ── */
+  .arch-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin-top: 1rem;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 2;
+    color: var(--ink-2);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: #0f1117;
+    color: #e2e8f0;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.8;
+    overflow-x: auto;
+    margin-top: 0.75rem;
+    position: relative;
+  }
+
+  .code-block .code-label {
+    position: absolute;
+    top: 10px; right: 14px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    font-weight: 600;
+  }
+
+  .code-block .cm { color: #718096; }
+  .code-block .ck { color: #81e6d9; }
+  .code-block .cs { color: #fbd38d; }
+  .code-block .cp { color: #fc8181; }
+
+  /* ── SCRIPT / SPEAKING ── */
+  .script-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-top: 0.75rem;
+  }
+
+  .script-line {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .script-line:last-child { border-bottom: none; }
+
+  .script-tag {
+    min-width: 100px;
+    padding: 12px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-light);
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    padding-top: 14px;
+    border-right: 1px solid var(--border);
+  }
+
+  .script-content {
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+
+  /* ── STEP LIST ── */
+  .step-list { list-style: none; margin-top: 0.75rem; }
+
+  .step-list li {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+
+  .step-list li p {
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+
+  .step-list li code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--surface-3);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  /* ── Q&A ── */
+  .qa-list { margin-top: 0.75rem; }
+
+  .qa-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .qa-q {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .qa-q-badge {
+    flex-shrink: 0;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    margin-top: 1px;
+  }
+
+  .qa-a {
+    font-size: 13.5px;
+    color: var(--ink-2);
+    line-height: 1.6;
+    padding-left: 32px;
+  }
+
+  .qa-a code {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    background: var(--surface-3);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  /* ── TROUBLE CARDS ── */
+  .trouble-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .trouble-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+  }
+
+  .trouble-card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .trouble-card h4::before {
+    content: '⚠';
+    font-size: 12px;
+    color: var(--warning);
+  }
+
+  .trouble-card p {
+    font-size: 13px;
+    color: var(--ink-3);
+    line-height: 1.55;
+  }
+
+  /* ── EXPECTED OUTPUTS ── */
+  .output-list {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .output-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 13.5px;
+  }
+
+  .output-item code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--surface-3);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .output-bullet {
+    width: 7px; height: 7px;
+    min-width: 7px;
+    border-radius: 50%;
+    background: var(--success);
+    margin-top: 7px;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 99px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav { display: none; }
+    main { padding: 2rem 1.5rem; max-width: 100%; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .feature-grid { grid-template-columns: 1fr; }
+    .trouble-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="nav-logo">
+    <div class="nav-logo-badge">Security Report</div>
+    <h2>Inventory Management System</h2>
+  </div>
+
+  <div class="nav-section-label">Phases</div>
+  <a href="#phase1" class="active"><span class="nav-num">01</span>Security Audit Report</a>
+  <a href="#phase2"><span class="nav-num">02</span>Extra Security Features</a>
+  <a href="#phase3"><span class="nav-num">03</span>Demo Guide</a>
+
+  <div class="nav-section-label" style="margin-top:1rem;">Demo Sections</div>
+  <a href="#overview"><span class="nav-num">3.1</span>Project Overview</a>
+  <a href="#arch"><span class="nav-num">3.2</span>Architecture</a>
+  <a href="#walkthrough"><span class="nav-num">3.3</span>Feature Walkthrough</a>
+  <a href="#script"><span class="nav-num">3.4</span>Speaking Script</a>
+  <a href="#demoflow"><span class="nav-num">3.5</span>Demo Flow</a>
+  <a href="#commands"><span class="nav-num">3.6</span>Terminal Commands</a>
+  <a href="#security-tests"><span class="nav-num">3.7</span>Security Tests</a>
+  <a href="#apitesting"><span class="nav-num">3.8</span>API Testing</a>
+  <a href="#dbverify"><span class="nav-num">3.9</span>DB Verification</a>
+  <a href="#clickdemo"><span class="nav-num">3.10</span>Click-by-Click Demo</a>
+  <a href="#expected"><span class="nav-num">3.11</span>Expected Outputs</a>
+  <a href="#whatosay"><span class="nav-num">3.12</span>What to Say</a>
+  <a href="#qa"><span class="nav-num">3.13</span>Q&A Panel</a>
+  <a href="#trouble"><span class="nav-num">3.14</span>Troubleshooting</a>
+  <a href="#cheatsheet"><span class="nav-num">3.15</span>Cheat Sheet</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main>
+
+  <!-- ════════════════════ PHASE 1 ════════════════════ -->
+  <section id="phase1">
+    <div class="phase-header">
+      <div class="phase-num">01</div>
+      <div class="phase-header-text">
+        <h1>Security Audit Report</h1>
+        <p>Comprehensive review of authentication, authorization, input security, web protections, and deployment configuration.</p>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="stats-bar">
+      <div class="stat-card stat-total">
+        <div class="stat-num">60</div>
+        <div class="stat-label">Total Checks</div>
+      </div>
+      <div class="stat-card stat-low">
+        <div class="stat-num">33</div>
+        <div class="stat-label">Low Risk</div>
+      </div>
+      <div class="stat-card stat-med">
+        <div class="stat-num">26</div>
+        <div class="stat-label">Medium Risk</div>
+      </div>
+      <div class="stat-card stat-high">
+        <div class="stat-num">1</div>
+        <div class="stat-label">High Risk</div>
+      </div>
+    </div>
+
+    <!-- Authentication -->
+    <div class="audit-category">
+      <h3>Authentication</h3>
+      <table class="audit-table">
+        <thead>
+          <tr>
+            <th style="width:22%">Feature</th>
+            <th style="width:14%">Status</th>
+            <th style="width:38%">Evidence from Code</th>
+            <th style="width:10%">Risk</th>
+            <th style="width:16%">Recommendation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>JWT authentication</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Login route creates token with <code>jwt.sign</code> and stores it in an HttpOnly cookie (<code>authController.login</code>)</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Access token generation</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Token issued after successful login, expires based on <code>process.env.JWT_EXPIRES</code></td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Refresh token implementation</td><td><span class="badge badge-missing">✗ Missing</span></td><td class="evidence-text">No refresh token logic in codebase</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Introduce a long-lived refresh token stored in HttpOnly cookie; rotate on each use.</td></tr>
+          <tr><td>Token expiry</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Expiry set via <code>JWT_EXPIRES</code> env var (defaults to "1d")</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">Consider shorter access token (15–30 min) with refresh flow.</td></tr>
+          <tr><td>Secure token storage</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Token set as HttpOnly, Secure (when NODE_ENV=production), SameSite=Strict cookie.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Logout invalidation</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Logout route clears <code>token</code> and <code>captchaHash</code> cookies.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Forgot-password flow</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Generate random reset token, store hash & expiry (10 min), send email via Ethereal.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Reset token expiration</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Expires after 10 minutes (see <code>resetPassword</code> controller).</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Email verification</td><td><span class="badge badge-missing">✗ Missing</span></td><td class="evidence-text">No verification endpoint or flag in <code>User</code> model.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Add <code>isVerified</code> column, send verification link on registration.</td></tr>
+          <tr><td>Password hashing (bcrypt)</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Passwords hashed with <code>bcrypt.hash</code> before storage.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Secure password comparison</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Login uses <code>bcrypt.compare</code>.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Authorization -->
+    <div class="audit-category">
+      <h3>Authorization</h3>
+      <table class="audit-table">
+        <thead>
+          <tr><th style="width:22%">Feature</th><th style="width:14%">Status</th><th style="width:38%">Evidence from Code</th><th style="width:10%">Risk</th><th style="width:16%">Recommendation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Role-based access control</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">roleMiddleware checks array of allowed roles (admin, manager) on product and store routes.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Admin-only endpoints</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Store addition limited to admin role.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Manager permissions</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Product addition allowed for admin & manager.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Route guards (frontend)</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">AuthContext provides user state but protected routes rely on <code>ProtectedWrapper</code> without role checks.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Extend <code>ProtectedWrapper</code> to verify role & redirect.</td></tr>
+          <tr><td>API access validation</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">All CRUD routers use <code>authMiddleware</code> to verify JWT.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Input Security -->
+    <div class="audit-category">
+      <h3>Input Security</h3>
+      <table class="audit-table">
+        <thead>
+          <tr><th style="width:22%">Feature</th><th style="width:14%">Status</th><th style="width:38%">Evidence from Code</th><th style="width:10%">Risk</th><th style="width:16%">Recommendation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Frontend validation</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Forms use HTML required attributes but lack comprehensive client-side checks.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Integrate Yup/React-Hook-Form for schema validation.</td></tr>
+          <tr><td>Backend validation</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Only register/login use <code>validators.js</code>; other routes accept raw body.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Add express-validator middleware to product, purchase, sales, store routes.</td></tr>
+          <tr><td>Sanitization</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Server uses <code>xss-clean</code> middleware.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>SQL-injection prevention</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">All DB access uses Sequelize's parameterized queries.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>NoSQL injection</td><td><span class="badge badge-na">– N/A</span></td><td class="evidence-text">Project uses only PostgreSQL via Sequelize.</td><td><span class="badge badge-na">–</span></td><td class="fix-text">–</td></tr>
+          <tr><td>Command injection risks</td><td><span class="badge badge-ok">✓ None found</span></td><td class="evidence-text">No <code>child_process exec</code> usage.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Path traversal risks</td><td><span class="badge badge-ok">✓ None found</span></td><td class="evidence-text">Static files served from fixed <code>/uploads</code> directory.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">Validate filenames on upload.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Web Security -->
+    <div class="audit-category">
+      <h3>Web Security</h3>
+      <table class="audit-table">
+        <thead>
+          <tr><th style="width:22%">Feature</th><th style="width:14%">Status</th><th style="width:38%">Evidence from Code</th><th style="width:10%">Risk</th><th style="width:16%">Recommendation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>XSS prevention</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">React escapes output; server uses <code>xss-clean</code>.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>CSRF protection</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">csurf middleware with HttpOnly SameSite-Strict cookie; applied globally except login/register.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>CORS configuration</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">cors allows origin <code>http://localhost:3000</code> and credentials.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">Lock down to production domain before release.</td></tr>
+          <tr><td>CSP headers</td><td><span class="badge badge-missing">✗ Missing</span></td><td class="evidence-text">No Content-Security-Policy set.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Use <code>helmet.contentSecurityPolicy</code> to restrict scripts, styles, media.</td></tr>
+          <tr><td>Helmet security headers</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text"><code>app.use(helmet())</code> plus cross-origin policy.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Clickjacking protection</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Helmet sets <code>X-Frame-Options: DENY</code>.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>MIME sniffing protection</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Helmet adds <code>X-Content-Type-Options: nosniff</code>.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>HSTS</td><td><span class="badge badge-missing">✗ Missing</span></td><td class="evidence-text">Helmet not configured for <code>Strict-Transport-Security</code>.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Add <code>helmet.hsts({ maxAge: 31536000 })</code> for production.</td></tr>
+          <tr><td>Secure cookies</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Cookie options set Secure flag when NODE_ENV=production.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>SameSite config</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">SameSite=Strict for CSRF cookie.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Attack Protection -->
+    <div class="audit-category">
+      <h3>Attack Protection</h3>
+      <table class="audit-table">
+        <thead>
+          <tr><th style="width:22%">Feature</th><th style="width:14%">Status</th><th style="width:38%">Evidence from Code</th><th style="width:10%">Risk</th><th style="width:16%">Recommendation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Brute-force login protection</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">express-rate-limit limits login route to 5 attempts per 15 min.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Rate limiting (global)</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Global limiter 100 requests per 15 min.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Account lockout</td><td><span class="badge badge-missing">✗ Missing</span></td><td class="evidence-text">No lockout after repeated failures.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Track failures per IP/user and lock after threshold.</td></tr>
+          <tr><td>CAPTCHA</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Login & Register pages fetch SVG captcha; server verifies hash.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Abuse prevention</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Rate limiting present; no IP-based throttling for other mutating routes.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Apply limiter to <code>/api/product</code>, <code>/api/purchase</code>, <code>/api/sales</code>, <code>/api/store</code>.</td></tr>
+          <tr><td>Suspicious request handling</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Server returns generic 400/500 messages; no detailed logging.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Integrate winston/morgan with log level WARN for suspicious patterns.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Error Handling -->
+    <div class="audit-category">
+      <h3>Error Handling</h3>
+      <table class="audit-table">
+        <thead>
+          <tr><th style="width:22%">Feature</th><th style="width:14%">Status</th><th style="width:38%">Evidence from Code</th><th style="width:10%">Risk</th><th style="width:16%">Recommendation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Secure error messages</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Some catch blocks return generic "Server error" but others leak <code>err.message</code> (e.g., addPurchase).</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Never expose internal error details; log them server-side.</td></tr>
+          <tr><td>No stack traces exposed</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Stack traces not sent to client, but console logs are present.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">Fine.</td></tr>
+          <tr><td>Proper frontend error display</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">React components show error alerts.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Database Security -->
+    <div class="audit-category">
+      <h3>Database Security</h3>
+      <table class="audit-table">
+        <thead>
+          <tr><th style="width:22%">Feature</th><th style="width:14%">Status</th><th style="width:38%">Evidence from Code</th><th style="width:10%">Risk</th><th style="width:16%">Recommendation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Hashed passwords</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">bcrypt hashes stored in <code>users.password</code>.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Secrets not stored in DB</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">No secret keys in DB tables.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Least-privilege DB config</td><td><span class="badge badge-missing">✗ Unknown</span></td><td class="evidence-text">.env shows DB user "postgres" – likely superuser.</td><td><span class="badge badge-high">⚠ High</span></td><td class="fix-text">Create a dedicated low-privilege DB role for the app.</td></tr>
+          <tr><td>Migration safety</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text"><code>sequelize.sync({alter:true})</code> runs on start.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Prefer explicit migration files (sequelize-cli) for production.</td></tr>
+          <tr><td>Protected admin data</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Only role checks; no row-level security on admin-only records.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Enforce owner checks in queries; avoid returning admin fields to normal users.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Session/Token Security -->
+    <div class="audit-category">
+      <h3>Session & Token Security</h3>
+      <table class="audit-table">
+        <thead>
+          <tr><th style="width:22%">Feature</th><th style="width:14%">Status</th><th style="width:38%">Evidence from Code</th><th style="width:10%">Risk</th><th style="width:16%">Recommendation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Token expiry validation</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text"><code>jwt.verify</code> checks expiry automatically.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Token tampering protection</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">HS256 signature with secret.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>JWT secret management</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Secret stored in .env (JWT_SECRET). No rotation strategy.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Rotate secret periodically; store in secret manager.</td></tr>
+          <tr><td>Refresh token rotation</td><td><span class="badge badge-missing">✗ Missing</span></td><td class="evidence-text">None.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Implement refresh token flow.</td></tr>
+          <tr><td>Replay attack prevention</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">CSRF token mitigates form replay; no nonce on API calls.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Include <code>jti</code> claim in JWT and blacklist on logout.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- API Security -->
+    <div class="audit-category">
+      <h3>API Security</h3>
+      <table class="audit-table">
+        <thead>
+          <tr><th style="width:22%">Feature</th><th style="width:14%">Status</th><th style="width:38%">Evidence from Code</th><th style="width:10%">Risk</th><th style="width:16%">Recommendation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Auth middleware verification</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text"><code>authMiddleware</code> verifies JWT before route handlers.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Protected CRUD endpoints</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">All CRUD routers use <code>authMiddleware</code>.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>IDOR vulnerabilities</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Queries filter by <code>req.user.id</code>. However update/delete routes do not verify ownership on all models (e.g., store delete only checks store.id/userID).</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Ensure every mutating query includes <code>userID</code> condition.</td></tr>
+          <tr><td>Mass assignment vulnerabilities</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Controllers manually pick fields, but update calls use object literals that could be extended if extra fields are sent.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Whitelist allowed fields before calling <code>update</code>.</td></tr>
+          <tr><td>Broken access control</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Role checks exist only on product/store routes; sales and purchases have no role restrictions.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Apply roleMiddleware where appropriate.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Frontend Security -->
+    <div class="audit-category">
+      <h3>Frontend Security</h3>
+      <table class="audit-table">
+        <thead>
+          <tr><th style="width:22%">Feature</th><th style="width:14%">Status</th><th style="width:38%">Evidence from Code</th><th style="width:10%">Risk</th><th style="width:16%">Recommendation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Hidden protected routes</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text"><code>ProtectedWrapper</code> wraps main app routes.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Token misuse</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Token stored in HttpOnly cookie – good. However login also stores user object in localStorage, which could be tampered.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Store minimal user info in memory; avoid persisting sensitive data.</td></tr>
+          <tr><td>LocalStorage security concerns</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Persisted user object includes role; could be edited.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Validate token server-side for role; never trust client-side role.</td></tr>
+          <tr><td>Secure auth state handling</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">AuthContext relies on localStorage on load.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Read auth state from cookie via an endpoint on app load.</td></tr>
+          <tr><td>XSS risk in rendering</td><td><span class="badge badge-ok">✓ Low</span></td><td class="evidence-text">React escapes all interpolated values; no <code>dangerouslySetInnerHTML</code> except captcha SVG (trusted source).</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">Sanitize any external HTML before using <code>dangerouslySetInnerHTML</code>.</td></tr>
+          <tr><td>Form validation quality</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Required attributes present; missing pattern checks and password strength.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Add client-side validation with regex and strength meter.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- DevOps / Config -->
+    <div class="audit-category">
+      <h3>DevOps & Configuration</h3>
+      <table class="audit-table">
+        <thead>
+          <tr><th style="width:22%">Feature</th><th style="width:14%">Status</th><th style="width:38%">Evidence from Code</th><th style="width:10%">Risk</th><th style="width:16%">Recommendation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>.env usage</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">.env file exists and is ignored via .gitignore.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">None</td></tr>
+          <tr><td>Secrets exposure</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Gitignore protects .env, but the repo is local – ensure CI does not leak.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">Use secret manager in CI/CD.</td></tr>
+          <tr><td>Debug mode off</td><td><span class="badge badge-ok">✓ Implemented</span></td><td class="evidence-text">Server runs with NODE_ENV=development locally; production flag not set.</td><td><span class="badge badge-low">Low</span></td><td class="fix-text">Ensure <code>NODE_ENV=production</code> on deployment.</td></tr>
+          <tr><td>Production safety config</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Helmet, CORS, CSRF configured; missing CSP & HSTS.</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Add CSP & HSTS as noted.</td></tr>
+          <tr><td>Logging safety</td><td><span class="badge badge-partial">⚑ Partial</span></td><td class="evidence-text">Console.log used for errors (may expose info in logs).</td><td><span class="badge badge-medium">Medium</span></td><td class="fix-text">Replace with structured logger (winston) and avoid logging sensitive data.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ════════════════════ PHASE 2 ════════════════════ -->
+  <section id="phase2">
+    <div class="phase-header">
+      <div class="phase-num">02</div>
+      <div class="phase-header-text">
+        <h1>Extra Security Features</h1>
+        <p>Impressive additional capabilities recommended to elevate the system's security posture.</p>
+      </div>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h4>Audit Logging & Activity Trail</h4>
+        <p>Log every authentication event, CRUD action, and failed attempt with user ID, IP, timestamp, and user-agent. Store logs in a separate write-only DB table.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h4>Security Dashboard</h4>
+        <p>Build an admin-only page showing recent login attempts, lockouts, suspicious IPs, and audit reports using chart.js visualizations.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔑</div>
+        <h4>Password Strength Meter</h4>
+        <p>Use the zxcvbn library on the registration form to give real-time feedback on password strength and quality.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⏱</div>
+        <h4>Session Timeout & Inactivity Logout</h4>
+        <p>Set JWT short expiry (15 min) and a client-side timer that forces logout after 10 min of inactivity.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h4>IP Logging & Geo-Blocking</h4>
+        <p>Record request IPs; optionally block known malicious ranges to prevent abuse from targeted regions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <h4>Refresh Token Rotation & Revocation</h4>
+        <p>Issue rotating refresh tokens, store their IDs in DB, revoke on logout or reuse to prevent token theft.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡</div>
+        <h4>Content Security Policy (CSP)</h4>
+        <p>Strict policy allowing scripts only from self and CDN, styles from self, images from uploads.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h4>HSTS (HTTP Strict Transport Security)</h4>
+        <p>Enforce HTTPS in production to prevent protocol downgrade attacks and cookie hijacking.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h4>Two-Factor Authentication (2FA)</h4>
+        <p>Optional TOTP via authenticator apps for admin users to add a second layer of identity verification.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h4>Per-Route Rate Limiting</h4>
+        <p>Extend global limiter to cover product, purchase, sales, and store routes with per-IP throttling.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════ PHASE 3 ════════════════════ -->
+  <section id="phase3">
+    <div class="phase-header">
+      <div class="phase-num">03</div>
+      <div class="phase-header-text">
+        <h1>Full Presentation & Demo Guide</h1>
+        <p>Step-by-step instructions for demonstrating the system, including scripts, commands, and expected outputs.</p>
+      </div>
+    </div>
+
+    <!-- 3.1 Overview -->
+    <h2 class="section-title" id="overview">Project Overview</h2>
+    <p style="color:var(--ink-2); line-height:1.7;">The Inventory Management System (IMS) is a React frontend + Express/Sequelize backend with PostgreSQL. It supports multi-user accounts, role-based access (admin/manager/user), product/store management, purchases, and sales analytics.</p>
+
+    <!-- 3.2 Architecture -->
+    <h2 class="section-title" id="arch">System Architecture</h2>
+    <div class="arch-box">┌───────────────────────┐
+│      Frontend (React) │
+│  - UI (TailwindCSS)   │
+│  - AuthContext        │
+│  - fetchWithAuth      │
+│    (incl CSRF token)  │
+└─────────────┬─────────┘
+              │ HTTPS
+┌─────────────▼─────────┐
+│  Backend (Node.js)    │
+│  - Express            │
+│  - Helmet, CORS, CSRF │
+│  - JWT + HttpOnly     │
+│  - Rate-limit         │
+│  - Sequelize ORM      │
+│  - Controllers &      │
+│    Middleware         │
+└───────┬─────┬──────────┘
+        │     │
+  ┌─────▼──┐ ┌▼────────┐
+  │Postgres│ │  Redis  │
+  │ users  │ │(optional│
+  │products│ │sessions)│
+  └────────┘ └─────────┘</div>
+
+    <!-- 3.3 Feature Walkthrough -->
+    <h2 class="section-title" id="walkthrough">Feature Walkthrough</h2>
+    <ul class="step-list">
+      <li><div class="step-num">1</div><p><strong>Registration & Login</strong> — Captcha, bcrypt password hashing, JWT in HttpOnly cookie.</p></li>
+      <li><div class="step-num">2</div><p><strong>Role-Based UI</strong> — Admin can add stores; manager can add products.</p></li>
+      <li><div class="step-num">3</div><p><strong>CRUD Operations</strong> — All endpoints secured with <code>authMiddleware</code>.</p></li>
+      <li><div class="step-num">4</div><p><strong>Analytics Dashboard</strong> — Bar chart of monthly sales, doughnut of product distribution.</p></li>
+      <li><div class="step-num">5</div><p><strong>Forgot Password</strong> — Secure token, 10-minute expiry, email via Ethereal.</p></li>
+      <li><div class="step-num">6</div><p><strong>Security Controls</strong> — Helmet, CSP (to add), CSRF, rate limiting, XSS clean.</p></li>
+    </ul>
+
+    <!-- 3.4 Speaking Script -->
+    <h2 class="section-title" id="script">Full Speaking Script</h2>
+    <div class="script-block">
+      <div class="script-line"><div class="script-tag">Start</div><div class="script-content">"Good morning/afternoon, my name is Ashwin and I will present my Inventory Management System."</div></div>
+      <div class="script-line"><div class="script-tag">Slide 1</div><div class="script-content">"The application is a full-stack web app built with React on the front-end and Express/Sequelize on the back-end, persisting data in PostgreSQL."</div></div>
+      <div class="script-line"><div class="script-tag">Slide 2</div><div class="script-content">"We focused on authentication, authorization, injection, XSS/CSRF, and denial-of-service. The security checklist guided the implementation."</div></div>
+      <div class="script-line"><div class="script-tag">Slide 3</div><div class="script-content">"Users register with a password hashed using bcrypt. Login returns a signed JWT stored in an HttpOnly, Secure, SameSite-Strict cookie. The token expires after 1 day (configurable)."</div></div>
+      <div class="script-line"><div class="script-tag">Demo</div><div class="script-content">"I will open http://localhost:3000/login, fill email/password, solve the captcha, and click Sign In. The network tab shows a 200 response and a Set-Cookie header with the JWT."</div></div>
+      <div class="script-line"><div class="script-tag">Slide 4</div><div class="script-content">"All mutating requests include a CSRF token fetched from <code>/api/auth/csrf-token</code>; the server validates it via csurf. XSS-clean sanitizes incoming JSON."</div></div>
+      <div class="script-line"><div class="script-tag">Demo</div><div class="script-content">"I will open the Add Store page, inspect the request payload – you can see the CSRF-Token header and the cookie is not readable from JavaScript."</div></div>
+      <div class="script-line"><div class="script-tag">Slide 5</div><div class="script-content">"Role-based access is enforced by <code>roleMiddleware</code>. Only admins can add a store, managers can add products."</div></div>
+      <div class="script-line"><div class="script-tag">Demo</div><div class="script-content">"Log in as a normal user, navigate to Add Store – the button is disabled and the API returns 403."</div></div>
+      <div class="script-line"><div class="script-tag">Slide 6</div><div class="script-content">"Global limiter 100 req/15 min, login-specific limiter 5 attempts per 15 min."</div></div>
+      <div class="script-line"><div class="script-tag">Demo</div><div class="script-content">"Attempt to login with a wrong password more than five times – the server responds with 'Too many requests'."</div></div>
+      <div class="script-line"><div class="script-tag">Slide 7</div><div class="script-content">"Secure reset token, hashed and stored, expires after 10 minutes. Email sent via Ethereal."</div></div>
+      <div class="script-line"><div class="script-tag">Demo</div><div class="script-content">"Enter an email on the Forgot Password page, check server console for the preview URL, click the link, set a new password."</div></div>
+      <div class="script-line"><div class="script-tag">Slide 8</div><div class="script-content">"During the audit we discovered missing refresh tokens, CSP, HSTS, and least-privilege DB user. Recommendations are listed in the audit table."</div></div>
+      <div class="script-line"><div class="script-tag">Slide 9</div><div class="script-content">"If time permits I can add an audit-log dashboard, password-strength meter, and two-factor authentication."</div></div>
+      <div class="script-line"><div class="script-tag">Close</div><div class="script-content">"Thank you for your attention. I'm happy to answer any questions."</div></div>
+    </div>
+
+    <!-- 3.5 Demo Flow -->
+    <h2 class="section-title" id="demoflow">Demo Flow (Step-by-Step)</h2>
+    <ul class="step-list">
+      <li><div class="step-num">1</div><p>Start backend: <code>cd Backend && npm install && npm run dev</code></p></li>
+      <li><div class="step-num">2</div><p>Start frontend: <code>cd Frontend && npm install && npm start</code></p></li>
+      <li><div class="step-num">3</div><p>Open <code>http://localhost:3000/login</code></p></li>
+      <li><div class="step-num">4</div><p>Enter credentials (e.g., <code>admin@example.com / password123</code>), solve captcha, click Sign In.</p></li>
+      <li><div class="step-num">5</div><p>Observe network: <code>Set-Cookie: token=…; HttpOnly; Secure (in prod); SameSite=Strict</code></p></li>
+      <li><div class="step-num">6</div><p>Navigate to Dashboard – verify sales & purchase totals load.</p></li>
+      <li><div class="step-num">7</div><p>Attempt to access <code>/api/store/add</code> as a normal user – expect <code>403 Forbidden</code>.</p></li>
+      <li><div class="step-num">8</div><p>Trigger rate-limit by sending 6 rapid login attempts – the 6th returns "Too many requests".</p></li>
+      <li><div class="step-num">9</div><p>Open <code>/forgot-password</code>, submit email, copy Ethereal preview URL from server console, reset password.</p></li>
+      <li><div class="step-num">10</div><p>Log out – confirm cookie cleared.</p></li>
+    </ul>
+
+    <!-- 3.6 Terminal Commands -->
+    <h2 class="section-title" id="commands">Terminal Commands</h2>
+    <div class="code-block">
+      <div class="code-label">bash</div>
+<span class="cm"># Backend</span>
+cd /home/ashwin/Inventory-Management-System/Backend
+npm install
+npm run dev   <span class="cm"># starts server on PORT 4000</span>
+
+<span class="cm"># Frontend</span>
+cd /home/ashwin/Inventory-Management-System/Frontend
+npm install
+npm start      <span class="cm"># launches React dev server on PORT 3000</span>
+
+<span class="cm"># Database (PostgreSQL) verification</span>
+psql -U postgres -d inventory_management -c "\dt"
+psql -U postgres -d inventory_management -c "SELECT * FROM users LIMIT 5;"</div>
+
+    <!-- 3.7 Security Tests -->
+    <h2 class="section-title" id="security-tests">Security Test Commands</h2>
+    <div class="code-block">
+      <div class="code-label">bash</div>
+<span class="cm"># 1. JWT verification (valid token)</span>
+curl -i -X GET http://localhost:4000/api/product/get \
+  -H "Cookie: token=$(cat token.txt)" \
+  -H "CSRF-Token: $(cat csrf.txt)" \
+  -b cookie.txt
+
+<span class="cm"># 2. CSRF protection – missing token should fail</span>
+curl -i -X POST http://localhost:4000/api/product/add \
+  -H "Cookie: token=$(cat token.txt)" \
+  -d '{"name":"Test","manufacturer":"X","stock":10}' \
+  -H "Content-Type: application/json"
+
+<span class="cm"># 3. Rate limit – simulate rapid login attempts</span>
+for i in {1..6}; do
+  curl -s -X POST http://localhost:4000/api/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email":"user@example.com","password":"wrong"}' | jq .
+done
+
+<span class="cm"># 4. Refresh token (missing) – expect 401</span>
+curl -i http://localhost:4000/api/auth/refresh</div>
+
+    <!-- 3.8 API Testing -->
+    <h2 class="section-title" id="apitesting">API Testing Commands (cURL)</h2>
+    <div class="code-block">
+      <div class="code-label">bash</div>
+<span class="cm"># Register (with captcha)</span>
+curl -i -X POST http://localhost:4000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -H "CSRF-Token: $(cat csrf.txt)" \
+  -d '{
+    "firstName":"John",
+    "lastName":"Doe",
+    "email":"john.doe@example.com",
+    "password":"StrongPass!23",
+    "phoneNumber":"+1234567890",
+    "captchaAnswer":"AB12C"
+  }'
+
+<span class="cm"># Login</span>
+curl -i -X POST http://localhost:4000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -H "CSRF-Token: $(cat csrf.txt)" \
+  -d '{"email":"john.doe@example.com","password":"StrongPass!23","captchaAnswer":"AB12C"}'
+
+<span class="cm"># Add Product (admin)</span>
+curl -i -X POST http://localhost:4000/api/product/add \
+  -H "Cookie: token=$(cat token.txt)" \
+  -H "CSRF-Token: $(cat csrf.txt)" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Widget","manufacturer":"Acme","stock":100,"description":"A useful widget"}'
+
+<span class="cm"># Get Products (any authenticated user)</span>
+curl -i -X GET http://localhost:4000/api/product/get \
+  -H "Cookie: token=$(cat token.txt)" \
+  -H "CSRF-Token: $(cat csrf.txt)"</div>
+
+    <!-- 3.9 DB Verification -->
+    <h2 class="section-title" id="dbverify">Database Verification Commands</h2>
+    <div class="code-block">
+      <div class="code-label">sql</div>
+<span class="cm">-- Verify password is hashed</span>
+psql -U postgres -d inventory_management -c "
+SELECT email, password FROM users WHERE email='john.doe@example.com';
+"
+
+<span class="cm">-- Verify role column</span>
+psql -U postgres -d inventory_management -c "
+SELECT email, role FROM users;
+"
+
+<span class="cm">-- Verify foreign-key constraints</span>
+psql -U postgres -d inventory_management -c "
+SELECT pg_constraint.conname, pg_get_constraintdef(pg_constraint.oid)
+FROM pg_constraint
+WHERE contype='f';
+"</div>
+
+    <!-- 3.10 Click Demo -->
+    <h2 class="section-title" id="clickdemo">Frontend Click-by-Click Demo</h2>
+    <ul class="step-list">
+      <li><div class="step-num">1</div><p>Open browser and go to <code>http://localhost:3000/login</code>.</p></li>
+      <li><div class="step-num">2</div><p>Enter email & password (use the account you created).</p></li>
+      <li><div class="step-num">3</div><p>Observe the captcha image, type the characters, click Sign In.</p></li>
+      <li><div class="step-num">4</div><p>After successful login you are redirected to the Dashboard.</p></li>
+      <li><div class="step-num">5</div><p>Hover over each summary card – notice the subtle shadow lift animation.</p></li>
+      <li><div class="step-num">6</div><p>Open the side-menu, click Add Store (admin only). If logged in as a non-admin, a toast "Forbidden" appears.</p></li>
+      <li><div class="step-num">7</div><p>Open Forgot Password, submit an email, watch the console for the Ethereal preview URL, open it, click the reset link, set a new password.</p></li>
+      <li><div class="step-num">8</div><p>Log out via the profile dropdown – confirm the login page appears again.</p></li>
+    </ul>
+
+    <!-- 3.11 Expected Outputs -->
+    <h2 class="section-title" id="expected">Expected Outputs</h2>
+    <div class="output-list">
+      <div class="output-item"><div class="output-bullet"></div><div>Login response: HTTP 200, <code>Set-Cookie: token=…</code>.</div></div>
+      <div class="output-item"><div class="output-bullet"></div><div>Invalid captcha or missing CSRF token: HTTP 400/403 with descriptive message.</div></div>
+      <div class="output-item"><div class="output-bullet"></div><div>Rate-limit exceeded: HTTP 429 with "Too many requests".</div></div>
+      <div class="output-item"><div class="output-bullet"></div><div>Forgot-password email logged: Console prints "Preview URL: …".</div></div>
+      <div class="output-item"><div class="output-bullet"></div><div>Dashboard cards display totals fetched from the API.</div></div>
+    </div>
+
+    <!-- 3.12 What to Say -->
+    <h2 class="section-title" id="whatosay">What to Say During Each Test</h2>
+    <div class="script-block">
+      <div class="script-line"><div class="script-tag">Login</div><div class="script-content">"Here we authenticate the user. The server validates the credentials, checks the captcha, generates a signed JWT and sends it in an HttpOnly cookie. Notice the cookie cannot be accessed via JavaScript, protecting it from XSS."</div></div>
+      <div class="script-line"><div class="script-tag">CSRF fail</div><div class="script-content">"This request is missing the CSRF token; the server rejects it with a 403, demonstrating our double-submit cookie strategy."</div></div>
+      <div class="script-line"><div class="script-tag">Rate limit</div><div class="script-content">"The login endpoint is protected by a rate limiter – after five failed attempts the sixth is blocked, preventing credential stuffing."</div></div>
+      <div class="script-line"><div class="script-tag">Forgot PW</div><div class="script-content">"The reset token is a random string hashed with SHA-256 before storage, and it expires after ten minutes, mitigating token reuse."</div></div>
+    </div>
+
+    <!-- 3.13 Q&A -->
+    <h2 class="section-title" id="qa">Common Panel Questions & Answers</h2>
+    <div class="qa-list">
+      <div class="qa-item">
+        <div class="qa-q"><span class="qa-q-badge">Q</span> Why no refresh token?</div>
+        <div class="qa-a">It was omitted for simplicity; we recommend adding a short-lived access token with a rotating refresh token stored in HttpOnly cookie to improve usability while keeping security.</div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q"><span class="qa-q-badge">Q</span> How do you prevent XSS?</div>
+        <div class="qa-a">Frontend uses React's automatic escaping; backend sanitizes incoming JSON with <code>xss-clean</code>. Captcha SVG is generated server-side, not user-supplied.</div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q"><span class="qa-q-badge">Q</span> Is the database user over-privileged?</div>
+        <div class="qa-a">Currently the .env uses the default <code>postgres</code> superuser. In production we would create a dedicated role with only SELECT/INSERT/UPDATE/DELETE on required tables.</div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q"><span class="qa-q-badge">Q</span> How would you add CSP?</div>
+        <div class="qa-a">Using Helmet: <code>helmet.contentSecurityPolicy({ directives: { defaultSrc: ["'self'"], scriptSrc: ["'self'", "https://cdn.jsdelivr.net"], styleSrc: ["'self'", "'unsafe-inline'"], imgSrc: ["'self'", "data:"] } })</code></div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q"><span class="qa-q-badge">Q</span> What about account lockout?</div>
+        <div class="qa-a">We can store a counter in Redis per user/IP; after N failed attempts we lock the account for a configurable period.</div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q"><span class="qa-q-badge">Q</span> How do you ensure logs don't leak secrets?</div>
+        <div class="qa-a">Replace <code>console.log</code> with winston, filter out fields like <code>password</code> or <code>token</code>.</div>
+      </div>
+    </div>
+
+    <!-- 3.14 Troubleshooting -->
+    <h2 class="section-title" id="trouble">Troubleshooting</h2>
+    <div class="trouble-grid">
+      <div class="trouble-card">
+        <h4>CSRF token missing</h4>
+        <p>Ensure the client fetched <code>/api/auth/csrf-token</code> before making a POST/PUT/DELETE request.</p>
+      </div>
+      <div class="trouble-card">
+        <h4>Cookie not set</h4>
+        <p>Check that the browser is not blocking third-party cookies; use SameSite=Strict and run on http://localhost (no HTTPS).</p>
+      </div>
+      <div class="trouble-card">
+        <h4>Rate limit blocks during demo</h4>
+        <p>Restart the backend or wait 15 minutes; the limiter stores state in memory.</p>
+      </div>
+      <div class="trouble-card">
+        <h4>Database connection failure</h4>
+        <p>Verify .env DB credentials; ensure PostgreSQL is running on the port defined (5433).</p>
+      </div>
+    </div>
+
+    <!-- 3.15 Cheat Sheet -->
+    <h2 class="section-title" id="cheatsheet">Final Cheat Sheet</h2>
+    <div class="code-block">
+      <div class="code-label">bash</div>
+<span class="cm"># Start backend & frontend</span>
+cd ~/Inventory-Management-System/Backend && npm i && npm run dev
+cd ~/Inventory-Management-System/Frontend && npm i && npm start
+
+<span class="cm"># Get CSRF token (store in variable)</span>
+CSRF=$(curl -s -c cookie.txt http://localhost:4000/api/auth/csrf-token | jq -r .csrfToken)
+
+<span class="cm"># Login (store JWT cookie)</span>
+curl -i -c cookie.txt -X POST http://localhost:4000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -H "CSRF-Token: $CSRF" \
+  -d '{"email":"admin@example.com","password":"AdminPass123","captchaAnswer":"ABCD"}'
+
+<span class="cm"># Example protected request</span>
+curl -b cookie.txt -X GET http://localhost:4000/api/product/get \
+  -H "CSRF-Token: $CSRF"
+
+<span class="cm"># Trigger rate limit (quick loop)</span>
+for i in {1..6}; do
+  curl -s -X POST http://localhost:4000/api/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email":"admin@example.com","password":"wrong"}'
+done</div>
+  </section>
+
+</main>
+
+<script>
+  const sections = document.querySelectorAll('section, h2[id]');
+  const links = document.querySelectorAll('nav a');
+
+  const allTargets = document.querySelectorAll('[id]');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`nav a[href="#${id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: "-20% 0px -75% 0px" });
+
+  allTargets.forEach(t => observer.observe(t));
+</script>
+</body>
+</html>
