@@ -14,6 +14,9 @@ function Store() {
   const authContext = useContext(AuthContext);
   const userId = authContext.user?.id ?? authContext.user;
 
+  const localStorageData = JSON.parse(localStorage.getItem("user")) || {};
+  const isAdmin = localStorageData.role === "admin";
+
   // Fetching all stores data
   const fetchData = React.useCallback(() => {
     if (!userId) return;
@@ -71,12 +74,14 @@ function Store() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Manage Stores</h2>
-        <button
-          className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
-          onClick={modalSetting}
-        >
-          Add Store
-        </button>
+        {isAdmin && (
+          <button
+            className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
+            onClick={modalSetting}
+          >
+            Add Store
+          </button>
+        )}
       </div>
 
       {/* Stores Grid */}
@@ -115,6 +120,7 @@ function Store() {
                   </svg>
                   <span>{element.address}{element.city ? `, ${element.city}` : ''}</span>
                 </div>
+                {isAdmin && (
                 <div className="mt-auto flex items-center space-x-3 pt-3 border-t border-gray-100">
                   <button
                     className="text-indigo-600 hover:text-indigo-900 text-sm font-medium transition-colors focus:outline-none"
@@ -129,6 +135,7 @@ function Store() {
                     Delete
                   </button>
                 </div>
+                )}
               </div>
             </div>
           ))}

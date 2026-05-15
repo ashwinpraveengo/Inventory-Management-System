@@ -32,7 +32,6 @@ const addPurchase = async (req, res) => {
 const getPurchaseData = async (req, res) => {
   try {
     const findAllPurchaseData = await Purchase.findAll({
-      where: { userID: req.user.id },
       include: [{
         association: 'product',
         model: require("../models/product"),
@@ -49,7 +48,6 @@ const getPurchaseData = async (req, res) => {
 const getTotalPurchaseAmount = async (req, res) => {
   try {
     const purchaseData = await Purchase.findAll({
-      where: { userID: req.user.id },
       attributes: [
         [sequelize.fn('SUM', sequelize.col('TotalPurchaseAmount')), 'totalPurchaseAmount']
       ],

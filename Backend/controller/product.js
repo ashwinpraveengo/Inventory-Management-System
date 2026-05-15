@@ -33,10 +33,6 @@ const addProduct = async (req, res) => {
 const getAllProducts = async (req, res) => {
   try {
     const products = await Product.findAll({
-      where: {
-        userID: req.user.id,
-      },
-
       order: [["id", "DESC"]],
     });
 
@@ -149,8 +145,6 @@ const searchProduct = async (req, res) => {
 
     const products = await Product.findAll({
       where: {
-        userID: req.user.id,
-
         name: {
           [Op.iLike]: `%${searchTerm}%`,
         },

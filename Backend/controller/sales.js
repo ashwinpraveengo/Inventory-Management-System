@@ -34,7 +34,6 @@ const addSales = async (req, res) => {
 const getSalesData = async (req, res) => {
   try {
     const findAllSalesData = await Sales.findAll({
-      where: { userID: req.user.id },
       include: [
         {
           association: 'product',
@@ -57,7 +56,6 @@ const getSalesData = async (req, res) => {
 const getTotalSalesAmount = async (req, res) => {
   try {
     const salesData = await Sales.findAll({
-      where: { userID: req.user.id },
       attributes: [
         [sequelize.fn('SUM', sequelize.col('TotalSaleAmount')), 'totalSaleAmount']
       ],

@@ -11,9 +11,9 @@ app.post("/add", authMiddleware, roleMiddleware(['admin']), store.addStore);
 app.get("/get", authMiddleware, store.getAllStores);
 
 // Delete Store
-app.delete("/delete/:id", authMiddleware, store.deleteStore);
+app.delete("/delete/:id", authMiddleware, roleMiddleware(['admin']), store.deleteStore);
 
 // Update Store
-app.put("/update/:id", authMiddleware, store.updateStore);
+app.put("/update/:id", authMiddleware, roleMiddleware(['admin']), store.updateStore);
 
 module.exports = app;

@@ -28,6 +28,7 @@ router.get(
 router.delete(
   "/delete/:id",
   authMiddleware,
+  roleMiddleware(['admin']),
   product.deleteSelectedProduct
 );
 
@@ -36,6 +37,7 @@ router.delete(
 router.put(
   "/update/:id",
   authMiddleware,
+  roleMiddleware(['admin']),
   product.updateSelectedProduct
 );
 

@@ -54,6 +54,9 @@ const App = () => {
       </div>
     );
 
+  // Helper: check if current user is admin
+  const isAdmin = user && user.role === "admin";
+
   return (
     <AuthContext.Provider value={value}>
       <BrowserRouter>
@@ -70,10 +73,10 @@ const App = () => {
               </ProtectedWrapper>
             }
           >
-            <Route index element={<Dashboard />} />
+            <Route index element={isAdmin ? <Dashboard /> : <Inventory />} />
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/purchase-details" element={<PurchaseDetails />} />
-            <Route path="/sales" element={<Sales />} />
+            {isAdmin && <Route path="/sales" element={<Sales />} />}
             <Route path="/manage-store" element={<Store />} />
             <Route path="/profile" element={<Profile />} />
           </Route>

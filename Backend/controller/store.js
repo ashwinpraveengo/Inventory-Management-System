@@ -22,7 +22,6 @@ const addStore = async (req, res) => {
 const getAllStores = async (req, res) => {
   try {
     const findAllStores = await Store.findAll({
-      where: { userID: req.user.id },
       order: [['id', 'DESC']],
     });
     res.json(findAllStores);

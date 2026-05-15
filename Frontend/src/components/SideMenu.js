@@ -25,10 +25,10 @@ function SideMenu() {
     { name: "Manage Store", href: "/manage-store", icon: BuildingStorefrontIcon },
   ];
 
-  if (localStorageData.role === "manager") {
-    navigation = navigation.filter(item => item.name !== "Manage Store");
-  } else if (localStorageData.role === "user") {
-    navigation = navigation.filter(item => ["Dashboard", "Inventory"].includes(item.name));
+  if (localStorageData.role === "user") {
+    navigation = navigation.filter(item =>
+      ["Inventory", "Purchase Details", "Manage Store"].includes(item.name)
+    );
   }
 
   return (
