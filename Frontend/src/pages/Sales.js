@@ -14,7 +14,9 @@ function Sales() {
 
   const fetchSalesData = useCallback(() => {
     if (!userId) return;
-    fetch(`http://localhost:4000/api/sales/get/${userId}`)
+    fetch(`http://localhost:4000/api/sales/get`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    })
       .then((response) => response.json())
       .then((data) => {
         setAllSalesData(data);
@@ -24,7 +26,9 @@ function Sales() {
 
   const fetchProductsData = useCallback(() => {
     if (!userId) return;
-    fetch(`http://localhost:4000/api/product/get/${userId}`)
+    fetch(`http://localhost:4000/api/product/get`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    })
       .then((response) => response.json())
       .then((data) => {
         setAllProducts(data);
@@ -34,7 +38,9 @@ function Sales() {
 
   const fetchStoresData = useCallback(() => {
     if (!userId) return;
-    fetch(`http://localhost:4000/api/store/get/${userId}`)
+    fetch(`http://localhost:4000/api/store/get`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    })
       .then((response) => response.json())
       .then((data) => {
         setAllStores(data);
@@ -59,76 +65,81 @@ function Sales() {
   };
 
   return (
-    <div className="col-span-12 lg:col-span-10  flex justify-center">
-      <div className=" flex flex-col gap-5 w-11/12">
-        {showSaleModal && (
-          <AddSale
-            addSaleModalSetting={addSaleModalSetting}
-            products={products}
-            stores={stores}
-            handlePageUpdate={handlePageUpdate}
-            authContext={authContext}
-          />
-        )}
-        {/* Table  */}
-        <div className="overflow-x-auto rounded-lg border bg-white border-gray-200 ">
-          <div className="flex justify-between pt-5 pb-3 px-3">
-            <div className="flex gap-4 justify-center items-center ">
-              <span className="font-bold">Sales</span>
-            </div>
-            <div className="flex gap-4">
-              <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 text-xs  rounded"
-                onClick={addSaleModalSetting}
-              >
-                {/* <Link to="/inventory/add-product">Add Product</Link> */}
-                Add Sales
-              </button>
-            </div>
-          </div>
-          <table className="min-w-full divide-y-2 divide-gray-200 text-sm">
-            <thead>
+    <div className="flex flex-col gap-6">
+      {showSaleModal && (
+        <AddSale
+          addSaleModalSetting={addSaleModalSetting}
+          products={products}
+          stores={stores}
+          handlePageUpdate={handlePageUpdate}
+          authContext={authContext}
+        />
+      )}
+
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Sales</h2>
+        <button
+          className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
+          onClick={addSaleModalSetting}
+        >
+          Add Sale
+        </button>
+      </div>
+
+      {/* Table Container */}
+      <div className="bg-white shadow-sm ring-1 ring-black ring-opacity-5 rounded-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Product Name
                 </th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Store Name
                 </th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Stock Sold
                 </th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Sales Date
                 </th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Total Sale Amount
                 </th>
               </tr>
             </thead>
-
-            <tbody className="divide-y divide-gray-200">
-              {sales.map((element, index) => {
-                return (
-                  <tr key={element._id}>
-                    <td className="whitespace-nowrap px-4 py-2  text-gray-900">
+            <tbody className="divide-y divide-gray-200 bg-white">
+              {sales.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500">
+                    No sales records found.
+                  </td>
+                </tr>
+              ) : (
+                sales.map((element) => (
+                  <tr key={element._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
                       {element.ProductID?.name}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                       {element.StoreID?.name}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                      {element.StockSold}
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {element.StockSold} units
+                      </span>
                     </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                       {element.SaleDate}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900">
                       ${element.TotalSaleAmount}
                     </td>
                   </tr>
-                );
-              })}
+                ))
+              )}
             </tbody>
           </table>
         </div>

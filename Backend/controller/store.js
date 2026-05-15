@@ -5,7 +5,7 @@ const addStore = async (req, res) => {
   try {
     console.log(req.body);
     const newStore = await Store.create({
-      userID: req.body.userId,
+      userID: req.user.id,
       name: req.body.name,
       category: req.body.category,
       address: req.body.address,
@@ -22,7 +22,7 @@ const addStore = async (req, res) => {
 const getAllStores = async (req, res) => {
   try {
     const findAllStores = await Store.findAll({
-      where: { userID: req.params.userID },
+      where: { userID: req.user.id },
       order: [['id', 'DESC']],
     });
     res.json(findAllStores);

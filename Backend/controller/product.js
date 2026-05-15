@@ -14,7 +14,7 @@ const addProduct = async (req, res) => {
       userID: req.user.id,
       name: req.body.name,
       manufacturer: req.body.manufacturer,
-      stock: 0,
+      stock: req.body.stock || 0,
       description: req.body.description,
     });
 

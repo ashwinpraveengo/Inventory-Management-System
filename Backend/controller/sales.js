@@ -6,7 +6,7 @@ const { sequelize } = require("../models/index");
 const addSales = async (req, res) => {
   try {
     const addSale = await Sales.create({
-      userID: req.body.userID,
+      userID: req.user.id,
       ProductID: req.body.productID,
       StoreID: req.body.storeID,
       StockSold: req.body.stockSold,
@@ -24,7 +24,7 @@ const addSales = async (req, res) => {
 const getSalesData = async (req, res) => {
   try {
     const findAllSalesData = await Sales.findAll({
-      where: { userID: req.params.userID },
+      where: { userID: req.user.id },
       include: [
         {
           association: 'product',
@@ -47,7 +47,7 @@ const getSalesData = async (req, res) => {
 const getTotalSalesAmount = async (req, res) => {
   try {
     const salesData = await Sales.findAll({
-      where: { userID: req.params.userID },
+      where: { userID: req.user.id },
       attributes: [
         [sequelize.fn('SUM', sequelize.col('TotalSaleAmount')), 'totalSaleAmount']
       ],
